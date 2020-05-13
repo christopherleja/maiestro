@@ -6,6 +6,7 @@ import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
+    {document.addEventListener("keydown", e => console.log(e))}
     <App />
   </React.StrictMode>,
   document.getElementById('root')
