@@ -28,12 +28,15 @@ function Label(props) {
 
 class PianoConfig extends React.Component {
   componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('keydown', this.handleKeyDown)
+    
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('keydown', this.handleKeyDown)
   }
+
+
 
   handleKeyDown = (event) => {
     const numNotes = this.props.config.noteRange.last - this.props.config.noteRange.first + 1;

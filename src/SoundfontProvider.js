@@ -48,39 +48,36 @@ class SoundfontProvider extends React.Component {
             return `${this.props.hostname}/${soundfont}/${name}-${format}.js`;
         },
         }).then(instrument => {
+        this.props.handleInstrumentChange(instrument.name)
         this.setState({
             instrument,
         });
-        });
+        })
     };
 
     playNote = midiNumber => {
-        let timeStart = Date.now()
 
         this.props.audioContext.resume().then(() => {
         const audioNode = this.state.instrument.play(midiNumber);
-        audioNode.startTime = timeStart
         this.setState({
             activeAudioNodes: Object.assign({}, this.state.activeAudioNodes, {
             [midiNumber]: audioNode,
+            
             }),
-        }, () => console.log(this.state.activeAudioNodes));
+        });
         });
     };
 
     stopNote = midiNumber => {
-        let timeStop = Date.now()
         this.props.audioContext.resume().then(() => {
         if (!this.state.activeAudioNodes[midiNumber]) {
             return;
         }
         const audioNode = this.state.activeAudioNodes[midiNumber];
-        audioNode.stopTime = timeStop
         audioNode.stop();
-        console.log(audioNode.stopTime - audioNode.startTime)
         this.setState({
             activeAudioNodes: Object.assign({}, this.state.activeAudioNodes, {
-            [midiNumber]: null,
+            [midiNumber]: null
             }),
         });
         });
@@ -102,6 +99,7 @@ class SoundfontProvider extends React.Component {
     };
 
     render() {
+        // console.log(this.state.activeAudioNodes)
         return this.props.render({
         isLoading: !this.state.instrument,
         playNote: this.playNote,
