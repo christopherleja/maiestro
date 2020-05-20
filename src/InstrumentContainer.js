@@ -5,6 +5,8 @@ import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
 import CustomPiano from './CustomPiano';
 import SongBtnContainer from './SongBtnContainer'
+import * as mm from '@magenta/music';
+import { MusicRNN } from '@magenta/music';
 
 // webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -21,6 +23,8 @@ const keyboardShortcuts = KeyboardShortcuts.create({
   lastNote: noteRange.last,
   keyboardConfig: KeyboardShortcuts.HOME_ROW,
 });
+
+
 
 class InstrumentContainer extends React.Component {
   state = {
@@ -99,9 +103,7 @@ class InstrumentContainer extends React.Component {
 
   renderLoadedSongs = () => {
     if (this.state.loadedSongs.length > 0){
-      // console.log(this.state.loadedSongs)
       return this.state.loadedSongs.map(song => {
-        // console.log(song.id)
       return (<div>
       <div key={song.id} id={song.id} onClick={()=> {this.loadSong(song.id)}}>{song.title}</div>
         <button onClick={() => this.handleDelete(song.id)}> Delete </button>
@@ -110,13 +112,51 @@ class InstrumentContainer extends React.Component {
     }
   }
 
+  handleDuet = () => {
+  if (this.state.recording.mode !== "DUET"){
+    this.setRecording({
+      mode: "DUET"
+    })
+    this.startDuet()
+  } else {
+    this.setRecording({
+      mode: null
+    })
+  }
+}
+
+  startDuet = () => {
+    // if (this.state.recording.mode === "DUET"){
+      const magentaRecordings = this.state.recording.events.map(event => {
+        let note = {pitch: event.midiNumber, startTime: event.time, endTime: Math.ceil(event.time + 1)}
+        return note
+      })
+      let last = (magentaRecordings.length - 1)
+      const quantizedMagentaRecordings = {notes: magentaRecordings,
+        quantizationInfo: {stepsPerQuarter: 4}, 
+        tempos: [{time: 0, qpm: 120}],
+        totalQuantizedSteps: magentaRecordings[last].endTime 
+      }
+      this.playDuet(quantizedMagentaRecordings)
+  }
+
+  playDuet = (array) => {
+    if (this.props.rnnPlayer.isPlaying()) {
+      this.props.rnnPlayer.stop()
+      return
+    }else {
+      let rnnSteps = 20;
+      let rnnTemp = 1
+      this.props.improvRNN
+      .continueSequence(array, rnnSteps, rnnTemp)
+      .then((sample => this.props.rnnPlayer.start(sample)))
+    }
+  }
+
   loadSong = (songId) => {
     fetch(URL + `/${songId}`)
     .then(response => response.json())
     .then(song => {
-      console.log("song is ", song)
-      console.log("instrument is ", song.tracks[0])
-      console.log("state is ", this.state.recording)
       let newRecording = {...this.state.recording}
       newRecording.events = song.notes
       newRecording.mode = 'PLAYING'
@@ -124,7 +164,7 @@ class InstrumentContainer extends React.Component {
         title: song.title,
         instrument: song.tracks[0].instrument,
         recording: newRecording
-      }, () => console.log("state is ",this.state))
+      })
     });
   }
 
@@ -224,8 +264,10 @@ class InstrumentContainer extends React.Component {
           <button onClick={this.handleSave}>Save</button>
           <input onChange={this.handleTitle} value={this.state.title !== "" ? this.state.title: "untitled"}/>
           <button onClick={this.handleLoading}>Load</button>
+          <button onClick={this.handleDuet}>Duet Mode</button>
         </div>
         <div className="mt-5">
+          {/* {console.log(this.state.recording.currentEvents)} */}
           {songBtns}
         </div>
       </>

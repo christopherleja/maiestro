@@ -53,6 +53,7 @@ class CustomPiano extends React.Component {
       };
     });
     
+
     this.props.setRecording({
       events: this.props.recording.events.concat(newEvents),
       currentTime: this.props.recording.currentTime + duration,
