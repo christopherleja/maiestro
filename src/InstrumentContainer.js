@@ -151,7 +151,10 @@ class InstrumentContainer extends React.Component {
       let rnnTemp = 1
       this.props.improvRNN
       .continueSequence(array, rnnSteps, rnnTemp)
-      .then((sample => this.props.rnnPlayer.start(sample)))
+      .then((sample => {
+        console.log(sample)
+        this.props.rnnPlayer.start(sample)
+      }))
     }
   }
 
