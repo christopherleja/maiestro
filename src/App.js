@@ -12,7 +12,7 @@ function App() {
   const improvRNN = new mm.MusicRNN(magentaCheckpoint) 
   improvRNN.initialize()
 
-  const rnnPlayer = new mm.Player()
+  const rnnPlayer = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus')
 
   return (
     <>

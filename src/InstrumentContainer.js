@@ -128,14 +128,16 @@ class InstrumentContainer extends React.Component {
   startDuet = () => {
     // if (this.state.recording.mode === "DUET"){
       const magentaRecordings = this.state.recording.events.map(event => {
-        let note = {pitch: event.midiNumber, startTime: event.time, endTime: Math.ceil(event.time + 1)}
+        let note = {pitch: event.midiNumber, startTime: (event.time * 4), endTime: Math.ceil(event.time * 4 + event.duration
+           * 4)}
         return note
       })
+      // const quantizeRecording = mm.sequences.quantizeNoteSequence(magentaRecordings, 4)
       let last = (magentaRecordings.length - 1)
       const quantizedMagentaRecordings = {notes: magentaRecordings,
         quantizationInfo: {stepsPerQuarter: 4}, 
         tempos: [{time: 0, qpm: 120}],
-        totalQuantizedSteps: magentaRecordings[last].endTime 
+        totalQuantizedSteps: Math.ceil(magentaRecordings[last].endTime) 
       }
       this.playDuet(quantizedMagentaRecordings)
   }
@@ -144,8 +146,8 @@ class InstrumentContainer extends React.Component {
     if (this.props.rnnPlayer.isPlaying()) {
       this.props.rnnPlayer.stop()
       return
-    }else {
-      let rnnSteps = 20;
+    } else {
+      let rnnSteps = 128;
       let rnnTemp = 1
       this.props.improvRNN
       .continueSequence(array, rnnSteps, rnnTemp)
