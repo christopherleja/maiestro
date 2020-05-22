@@ -4,15 +4,11 @@ import _ from 'lodash';
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
 import CustomPiano from './CustomPiano';
-import SongBtnContainer from './SongBtnContainer'
-import * as mm from '@magenta/music';
-import { MusicRNN } from '@magenta/music';
 
 // webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
-const URL = "http://localhost:3000/songs"
 
 const noteRange = {
   first: MidiNumbers.fromNote('c3'),
@@ -38,7 +34,7 @@ class InstrumentContainer extends React.Component {
     instrument: "",
     loadedSongs: []
   };
-
+  
   constructor(props) {
     super(props);
 
@@ -67,6 +63,7 @@ class InstrumentContainer extends React.Component {
   };
 
   handleSave = () => {
+    if (this.props.currentUser){
     let song = {
       user_id: 1,
       title: this.state.title,
@@ -74,11 +71,12 @@ class InstrumentContainer extends React.Component {
       instrument: this.state.instrument,
       notes: this.state.recording.events
     }
-    fetch(URL, {
+    fetch(this.props.url + '/songs', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
       },
+      credentials: "include",
       body: JSON.stringify(song),
     })
     .then(response => response.json())
@@ -88,10 +86,14 @@ class InstrumentContainer extends React.Component {
     .catch((error) => {
       console.error('Error:', error);
     });
+  } else {
+    alert("Please sign in to save or load songs")
   }
+}
 
   handleLoading = () => {
-    fetch(URL)
+    if (this.props.currentUser){
+    fetch(this.props.url + `/users/${this.props.currentUser.id}/songs`)
     .then(response => response.json())
     .then(songs => {
       this.setState({
@@ -99,7 +101,10 @@ class InstrumentContainer extends React.Component {
       })
       this.renderLoadedSongs()
     });
+  } else {
+    alert("Please sign in to save or load songs")
   }
+}
 
   renderLoadedSongs = () => {
     if (this.state.loadedSongs.length > 0){
@@ -126,7 +131,7 @@ class InstrumentContainer extends React.Component {
 }
 
   startDuet = () => {
-    // if (this.state.recording.mode === "DUET"){
+    if (this.state.recording.events.length > 0){
       const magentaRecordings = this.state.recording.events.map(event => {
         let note = {pitch: event.midiNumber, startTime: (event.time * 4), endTime: Math.ceil(event.time * 4 + event.duration
            * 4)}
@@ -140,6 +145,9 @@ class InstrumentContainer extends React.Component {
         totalQuantizedSteps: Math.ceil(magentaRecordings[last].endTime) 
       }
       this.playDuet(quantizedMagentaRecordings)
+    } else {
+      alert("Please record a melody before using duet mode")
+    }
   }
 
   playDuet = (array) => {
@@ -149,17 +157,16 @@ class InstrumentContainer extends React.Component {
     } else {
       let rnnSteps = 128;
       let rnnTemp = 1
-      this.props.improvRNN
+      this.props.melodyRNN
       .continueSequence(array, rnnSteps, rnnTemp)
       .then((sample => {
-        console.log(sample)
         this.props.rnnPlayer.start(sample)
       }))
     }
   }
 
   loadSong = (songId) => {
-    fetch(URL + `/${songId}`)
+    fetch(this.props.url + `/songs/${songId}`)
     .then(response => response.json())
     .then(song => {
       let newRecording = {...this.state.recording}
@@ -174,7 +181,7 @@ class InstrumentContainer extends React.Component {
   }
 
   handleDelete = (id) => {
-    fetch(URL + `/${id}`, 
+    fetch(this.props.url + `/songs/${id}`, 
     {method: 'DELETE'})
     .then(res => res.json())
     .then(res => {
@@ -272,7 +279,6 @@ class InstrumentContainer extends React.Component {
           <button onClick={this.handleDuet}>Duet Mode</button>
         </div>
         <div className="mt-5">
-          {/* {console.log(this.state.recording.currentEvents)} */}
           {songBtns}
         </div>
       </>
