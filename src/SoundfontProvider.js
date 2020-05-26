@@ -23,6 +23,7 @@ class SoundfontProvider extends React.Component {
         this.state = {
         activeAudioNodes: {},
         instrument: null,
+        playing: this.props.playing
         };
     }
 
@@ -30,11 +31,26 @@ class SoundfontProvider extends React.Component {
         this.loadInstrument(this.props.instrumentName);
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevProps.instrumentName !== this.props.instrumentName) {
-        this.loadInstrument(this.props.instrumentName);
-        }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.instrumentName !== this.props.instrumentName) {
+      this.loadInstrument(this.props.instrumentName);
+      } else if (!prevProps.playing){
+        let scheduledNotes = this.props.handlePlayingRecordedNotes()
+        if(scheduledNotes){
+          scheduledNotes.notes.map(note => {
+            console.log(note)
+            setTimeout(() => {
+            this.playNote(note.pitch)
+            }, note.start)
+
+            setTimeout(() => {
+            this.stopNote(note.pitch)
+          }, note.start + note.duration)
+        })
+        this.props.stopPlaying()
+      }
     }
+  }
 
     loadInstrument = instrumentName => {
         // Re-trigger loading state
@@ -55,33 +71,51 @@ class SoundfontProvider extends React.Component {
         })
     };
 
-    playNote = midiNumber => {
-
-        this.props.audioContext.resume().then(() => {
-        const audioNode = this.state.instrument.play(midiNumber);
-        this.setState({
-            activeAudioNodes: Object.assign({}, this.state.activeAudioNodes, {
-            [midiNumber]: audioNode,
-            
-            }),
-        });
-        });
+    resumeAudio = () => {
+      if (this.props.audioContext.state === 'suspended') {
+        return this.props.audioContext.resume();
+      } else {
+        return Promise.resolve();
+      }
     };
 
-    stopNote = midiNumber => {
-        this.props.audioContext.resume().then(() => {
-        if (!this.state.activeAudioNodes[midiNumber]) {
-            return;
-        }
-        const audioNode = this.state.activeAudioNodes[midiNumber];
-        audioNode.stop();
-        this.setState({
-            activeAudioNodes: Object.assign({}, this.state.activeAudioNodes, {
-            [midiNumber]: null
-            }),
-        });
-        });
-    };
+  playNote = (midiNumber) => {
+    const start = Date.now() - this.props.time
+    this.resumeAudio().then(() => {
+      const audioNode = this.state.instrument.play(midiNumber);
+      this.setState({
+        activeAudioNodes: Object.assign({}, this.state.activeAudioNodes, {
+          [midiNumber]: audioNode
+        }),
+      });
+      if (this.props.recording){
+        let note = {pitch: midiNumber, time: start}
+        this.props.handleRecordNoteStart(note)
+      } else {
+        return
+      }
+    });
+  };
+
+  stopNote = (midiNumber) => {
+    this.resumeAudio().then(() => {
+      if (!this.state.activeAudioNodes[midiNumber]) {
+        return;
+      }
+      const audioNode = this.state.activeAudioNodes[midiNumber];
+      audioNode.stop();
+      this.setState({
+        activeAudioNodes: Object.assign({}, this.state.activeAudioNodes, { [midiNumber]: null }),
+      });
+    });
+    if (this.props.recording){
+      const endTime = Date.now() - this.props.time
+      const note = {pitch: midiNumber, endTime: endTime}
+      this.props.handleRecordNoteEnd(note)
+    } else {
+      return
+    }
+  };
 
   // Clear any residual notes that don't get called with stopNote
     stopAllNotes = () => {

@@ -32,7 +32,7 @@ function App() {
     .then(r => r.json())
     .then(user => {
       setCurrentUser(user)
-    }, console.log(currentUser))
+    })
   }, [])
 
   return (

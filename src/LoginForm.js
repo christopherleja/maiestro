@@ -35,13 +35,13 @@ class LoginForm extends React.Component {
         this.props.updateCurrentUser(user)
         this.props.history.push("/home")
       })
-      .catch(err => console.error(err))
+      .catch(err => {
+        alert("Something went wrong. Please try again.")
+      })
     // this is our redirect
-    this.props.history.push("/home")
   }
 
   render() {
-    console.log(this.props.match.url)
     const { username, password } = this.state
     return (
       <div className="form-container">
