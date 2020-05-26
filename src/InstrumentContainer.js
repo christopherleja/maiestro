@@ -1,11 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
-import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
 import Instrument from './Instrument';
 import SongBtn from './SongBtn'
-import { instrument } from 'soundfont-player';
 
 // webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -22,7 +20,8 @@ class InstrumentContainer extends React.Component {
   handleSongLoad = (song) => {
     this.setState({
       song: song,
-      instrument: song.tracks[0].instrument
+      instrument: song.tracks[0].instrument,
+      title: song.title
     })
   }
 
