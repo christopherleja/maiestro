@@ -28,8 +28,8 @@ const SongBtn = (props) => {
 
     return (
       <div>
-        <div key={song.id} id={song.id} onClick={()=> {loadSong(song.id)}}>{song.title}</div>
-        <button onClick={() => handleDelete(song.id)}> Delete </button>
+        <div className="song-btn" key={song.id} id={song.id} onClick={()=> {loadSong(song.id)}}>Load {song.title}</div>
+        <button className="delete-btn" onClick={() => handleDelete(song.id)}> Delete {song.title}</button>
       </div>
       )
     }

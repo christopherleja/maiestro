@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import './css/LoginForm.css'
 
 class LoginForm extends React.Component {
   state = {
@@ -15,7 +15,6 @@ class LoginForm extends React.Component {
 
   handleSubmit = event => {
     event.preventDefault()
-    // TODO: when we get to auth, make this work
     fetch("http://localhost:3000/login", {
         method: "POST",
         headers: {

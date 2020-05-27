@@ -1,7 +1,7 @@
 import * as mm from '@magenta/music'
 import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux'
 import 'react-piano/dist/styles.css';
 import './App.css';
@@ -31,13 +31,20 @@ function App() {
     })
     .then(r => r.json())
     .then(user => {
-      setCurrentUser(user)
+      if (user.username){
+        setCurrentUser(user)
+      } else {
+        return
+      }
     })
   }, [])
 
   return (
     <>
     <Navbar url={URL} currentUser={currentUser} updateCurrentUser={updateCurrentUser}/>
+    <Route exact path="/"> 
+      <Redirect to="/home" />
+    </Route>
     <Route path="/login" render= {routeProps => <LoginForm {...routeProps} updateCurrentUser={updateCurrentUser}/>}/>
     <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} updateCurrentUser={updateCurrentUser}/>}/>
     <Route path='/home' render = {() => <InstrumentContainer melodyRNN={melodyRNN} rnnPlayer={rnnPlayer} currentUser={currentUser} url={URL}/>} />

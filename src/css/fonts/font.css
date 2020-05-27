@@ -1,0 +1,11 @@
+@font-face {
+	font-family: 'LCDN';
+	src: url('./LCDN.eot');
+	src: local('LCDN'), url('./LCDN.woff') format('woff'), url('./LCDN.ttf') format('truetype');
+}
+/* use this class to attach this font to any element i.e. <p class="fontsforweb_fontid_526">Text with this font applied</p> */
+.fontsforweb_fontid_526 {
+	font-family: 'LCDN' !important;
+}
+
+/* Font downloaded from FontsForWeb.com */

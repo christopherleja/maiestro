@@ -93,7 +93,7 @@ class PianoConfig extends React.Component {
     return (
       <div className="form-row">
         <div className="col-3">
-          <Label>First note</Label>
+          <Label className="label">First note</Label>
           <AutoblurSelect
             className="form-control"
             onChange={this.onChangeFirstNote}
@@ -107,7 +107,7 @@ class PianoConfig extends React.Component {
           </AutoblurSelect>
         </div>
         <div className="col-3">
-          <Label>Last note</Label>
+          <Label className="label">Last note</Label>
           <AutoblurSelect
             className="form-control"
             onChange={this.onChangeLastNote}
@@ -120,8 +120,8 @@ class PianoConfig extends React.Component {
             ))}
           </AutoblurSelect>
         </div>
-        <div className="col-6">
-          <Label>Instrument</Label>
+        <div className="col-3">
+          <Label className="label">Instrument</Label>
           <AutoblurSelect
             className="form-control"
             value={instrumentName}
@@ -133,12 +133,6 @@ class PianoConfig extends React.Component {
               </option>
             ))}
           </AutoblurSelect>
-        </div>
-        <div className="col mt-2">
-          <small className="text-muted">
-            Use <strong>left arrow</strong> and <strong>right arrow</strong> to move the keyboard
-            shortcuts around.
-          </small>
         </div>
       </div>
     );

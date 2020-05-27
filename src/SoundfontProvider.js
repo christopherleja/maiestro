@@ -38,7 +38,6 @@ class SoundfontProvider extends React.Component {
         let scheduledNotes = this.props.handlePlayingRecordedNotes()
         if(scheduledNotes){
           scheduledNotes.notes.map(note => {
-            console.log(note)
             setTimeout(() => {
             this.playNote(note.pitch)
             }, note.start)
@@ -48,6 +47,9 @@ class SoundfontProvider extends React.Component {
           }, note.start + note.duration)
         })
         this.props.stopPlaying()
+      } else if (prevProps.playing){
+        this.stopAllNotes()
+        
       }
     }
   }

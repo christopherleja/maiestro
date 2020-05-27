@@ -13,7 +13,7 @@ class Instrument extends React.Component {
       instrumentName: 'acoustic_grand_piano',
       noteRange: {
         first: MidiNumbers.fromNote('c3'),
-        last: MidiNumbers.fromNote('f4'),
+        last: MidiNumbers.fromNote('a4'),
       },
       keyboardShortcutOffset: 0,
       playing: false,
@@ -207,17 +207,19 @@ class Instrument extends React.Component {
         hostname={this.props.soundfontHostname}
         render={({ isLoading, playNote, stopNote, stopAllNotes }) => (
           <div>
-            <div className="text-center">
-              <p className="">Try it by clicking, tapping, or using your keyboard:</p>
+              <div className="text-center">
+                {/* <p className="">Use the mouse or keyboard to play!</p> */}
               <div style={{ color: '#777' }}>
               </div>
             </div>
-            <button onClick={this.handlePlay}>{this.state.playing ? "stop" : "play" }</button>
-            <button onClick={this.handleRecording}>{this.state.recording ? "stop" : "record" }</button>
-            <button onClick={this.handleClear}>Clear</button>
-            <button onClick={this.handleDuet}>Duet</button>
-            <button onClick={this.handleSave}>Save</button>
-            <button onClick={this.props.handleLoading}>Load</button>
+            <div className="btn-container">
+              <button className="instrument-btn" onClick={this.handlePlay}>{this.state.playing ? "Stop" : "Play" }</button>
+              <button className="instrument-btn" onClick={this.handleRecording}>{this.state.recording ? "Stop" : "Record" }</button>
+              <button className="instrument-btn" onClick={this.handleClear}>Clear</button>
+              <button className="instrument-btn" onClick={this.handleDuet}>Duet</button>
+              <button className="instrument-btn" onClick={this.handleSave}>Save</button>
+              <button className="instrument-btn" onClick={this.props.handleLoading}>Load</button>
+            </div>
             <div className="mt-4">
               <DimensionsProvider>
                 {({ containerWidth }) => (

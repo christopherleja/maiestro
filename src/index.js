@@ -6,6 +6,7 @@ import './index.css';
 import App from './App';
 import store from './store'
 import * as serviceWorker from './serviceWorker';
+import './css/fonts/LCDN.woff'
 
 ReactDOM.render(
   <Router >

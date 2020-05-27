@@ -78,7 +78,14 @@ class InstrumentContainer extends React.Component {
     const songBtns = this.renderLoadedSongs()
     return (
       <>
-      <div>
+      <div className="container">
+        <div className="title-card-container">
+          <input className="title title-card" onChange={this.handleTitle} value={this.state.title !== "" ? this.state.title: "untitled"}/>
+          <small className="instructions title-card">
+            Move shortcuts around by using left and right arrow keys.
+            Use the mouse or keyboard to play!
+          </small>
+        </div>
         <Instrument 
         soundfontHostname={soundfontHostname} audioContext={audioContext} 
         handleInstrumentChange={this.handleInstrumentChange} currentUser={this.props.currentUser}
@@ -86,9 +93,8 @@ class InstrumentContainer extends React.Component {
         handleLoading={this.handleLoading} song={this.state.song}/>
         </div>
         <div className="mt-5">
-          <input onChange={this.handleTitle} value={this.state.title !== "" ? this.state.title: "untitled"}/>
         </div>
-        <div className="mt-5">
+        <div className="song-btn-container">
           {songBtns}
         </div>
       </>

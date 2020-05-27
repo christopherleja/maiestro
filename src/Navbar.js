@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
+import './css/navbar.css'
 
 const NavBar = (props) => {
 
@@ -16,20 +16,20 @@ const NavBar = (props) => {
   }
 
     return (
-      <header>
-        <Link to="/home">
+      <header className="navbar">
+        <Link className="link" to="/home">
           <div className="logo" />
         </Link>
         <div className="actions">
           {props.currentUser ? (
-            <button onClick={handleLogout}>Logout {props.currentUser.username}</button>
+            <button className="btn" onClick={handleLogout}>Logout {props.currentUser.username}</button>
           ) : (
               <>
-                <Link to="/login">
-                  <button>Login</button>
+                <Link className="link" to="/login">
+                  <button className="btn">Login</button>
                 </Link>
-                <Link to="/signup">
-                  <button>Sign Up</button>
+                <Link className="link" to="/signup">
+                  <button className="btn">Sign Up</button>
                 </Link>
               </>
             )}
