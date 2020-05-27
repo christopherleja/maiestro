@@ -192,6 +192,7 @@ class Instrument extends React.Component {
       lastNote: this.state.config.noteRange.last + this.state.config.keyboardShortcutOffset,
       keyboardConfig: KeyboardShortcuts.HOME_ROW,
     });
+    const loaded = this.props.loadedSongs.length > 0 
     return (
       <SoundfontProvider
         time={this.state.time}
@@ -218,7 +219,7 @@ class Instrument extends React.Component {
               <button className="instrument-btn" onClick={this.handleClear}>Clear</button>
               <button className="instrument-btn" onClick={this.handleDuet}>Duet</button>
               <button className="instrument-btn" onClick={this.handleSave}>Save</button>
-              <button className="instrument-btn" onClick={this.props.handleLoading}>Load</button>
+              <button className="instrument-btn" onClick={loaded ? this.props.handleClearLoadedSongs : this.props.handleLoading}>{loaded ? "Clear Loaded" : "Load"}</button>
             </div>
             <div className="mt-4">
               <DimensionsProvider>

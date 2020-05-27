@@ -51,12 +51,12 @@ class SignUpForm extends React.Component {
         <h3>Sign up for an account</h3>
         <form onSubmit={this.handleSubmit}>
           <label>Username:</label>
-          <input type="text" name="username" onChange={this.handleInputChange} value={username} />
+          <input className="form" type="text" name="username" onChange={this.handleInputChange} value={username} />
           <label>Password:</label>
-          <input type="password" name="password" onChange={this.handleInputChange} value={password} />
+          <input className="form" type="password" name="password" onChange={this.handleInputChange} value={password} />
           <label>Confirm Password:</label>
-          <input type="password" name="password_confirmation" onChange={this.handleInputChange} value={password_confirmation} />
-          <input type="submit" value="Sign Up" />
+          <input className="form" type="password" name="password_confirmation" onChange={this.handleInputChange} value={password_confirmation} />
+          <input className="btn" type="submit" value="Sign Up" />
         </form>
       </div>
     )

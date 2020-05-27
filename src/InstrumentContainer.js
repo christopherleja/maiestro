@@ -58,6 +58,12 @@ class InstrumentContainer extends React.Component {
   )}
   }
 
+  handleClearLoadedSongs = () => {
+    this.setState({
+      loadedSongs: []
+    })
+  }
+
   toggleDisplayedButtons = (id) => {
     let updatedLoadedSongs = this.state.loadedSongs.filter(song => {
       if (song.id !== id)
@@ -90,7 +96,7 @@ class InstrumentContainer extends React.Component {
         soundfontHostname={soundfontHostname} audioContext={audioContext} 
         handleInstrumentChange={this.handleInstrumentChange} currentUser={this.props.currentUser}
         title={this.state.title} url={this.props.url} loadedSongs={this.state.loadedSongs} 
-        handleLoading={this.handleLoading} song={this.state.song}/>
+        handleLoading={this.handleLoading} song={this.state.song} handleClearLoadedSongs={this.handleClearLoadedSongs}/>
         </div>
         <div className="mt-5">
         </div>

@@ -10,7 +10,6 @@ import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
 import Navbar from './Navbar'
 
-
 function App() {
   const URL = "http://localhost:3000"
   const magentaCheckpoint = "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/melody_rnn"

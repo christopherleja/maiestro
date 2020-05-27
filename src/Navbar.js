@@ -18,7 +18,7 @@ const NavBar = (props) => {
     return (
       <header className="navbar">
         <Link className="link" to="/home">
-          <div className="logo" />
+          <div className="logo">maistro</div>
         </Link>
         <div className="actions">
           {props.currentUser ? (
