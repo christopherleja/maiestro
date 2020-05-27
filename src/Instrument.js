@@ -13,7 +13,7 @@ class Instrument extends React.Component {
       instrumentName: 'acoustic_grand_piano',
       noteRange: {
         first: MidiNumbers.fromNote('c3'),
-        last: MidiNumbers.fromNote('a4'),
+        last: MidiNumbers.fromNote('c5'),
       },
       keyboardShortcutOffset: 0,
       playing: false,
@@ -128,11 +128,14 @@ class Instrument extends React.Component {
       const notesToSequence = []
       const magentaRecordings = copy.map(note => {
         let newNote = {pitch: note.pitch}
-        newNote.time = Math.round(note.time / 1000)
-        newNote.endTime = Math.round(note.endTime / 1000)
+        let newTime = Math.round((note.time * 4) / 4).toFixed(2) 
+        newNote.time = Math.round((newTime / 1000) * 4)
+        let newEndTime = Math.round((note.endTime * 4) / 4).toFixed(2)
+        newNote.endTime = Math.round((newEndTime / 1000) * 4)
         notesToSequence.push(newNote)
         return notesToSequence
       })
+      console.log(notesToSequence)
       let last = notesToSequence.length - 1
       const quantizeRecording = mm.sequences.quantizeNoteSequence(notesToSequence, 4)
       quantizeRecording.notes = notesToSequence
