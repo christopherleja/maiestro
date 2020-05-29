@@ -44,8 +44,8 @@ function App() {
     <Route exact path="/"> 
       <Redirect to="/home" />
     </Route>
-    <Route path="/login" render= {routeProps => <LoginForm {...routeProps} updateCurrentUser={updateCurrentUser}/>}/>
-    <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} updateCurrentUser={updateCurrentUser}/>}/>
+    <Route path="/login" render= {routeProps => <LoginForm {...routeProps} updateCurrentUser={updateCurrentUser} url={URL}/>}/>
+    <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} updateCurrentUser={updateCurrentUser} url={URL}/>}/>
     <Route path='/home' render = {() => <InstrumentContainer melodyRNN={melodyRNN} rnnPlayer={rnnPlayer} currentUser={currentUser} url={URL}/>} />
     </>
   );

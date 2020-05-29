@@ -17,7 +17,7 @@ class SignUpForm extends React.Component {
   handleSubmit = event => {
     event.preventDefault()
     if (this.state.password === this.state.password_confirmation && this.state.password.length >= 6){
-      fetch("http://localhost:3000/signup", {
+      fetch(this.props.url + "/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
