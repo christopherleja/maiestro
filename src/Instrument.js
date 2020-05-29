@@ -137,7 +137,6 @@ class Instrument extends React.Component {
         notesToSequence.push(newNote)
         return notesToSequence
       })
-      console.log(notesToSequence)
       let last = notesToSequence.length - 1
       const quantizeRecording = mm.sequences.quantizeNoteSequence(notesToSequence, 4)
       quantizeRecording.notes = notesToSequence
