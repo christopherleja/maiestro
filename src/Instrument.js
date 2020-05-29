@@ -5,6 +5,8 @@ import DimensionsProvider from './DimensionsProvider';
 import InstrumentListProvider from './InstrumentListProvider';
 import SoundfontProvider from './SoundfontProvider';
 import PianoConfig from './PianoConfig';
+import swal from 'sweetalert';
+
 
 class Instrument extends React.Component {
   state = {
@@ -19,7 +21,7 @@ class Instrument extends React.Component {
       playing: false,
       time: 0,
       recording: false,
-      loadedSongs: []
+      loadedSongs: [],
     },
   };
   
@@ -52,9 +54,9 @@ class Instrument extends React.Component {
         console.error('Error:', error);
       });
     } else if (this.props.currentUser && this.props.title === "") {
-      alert("Please enter a title before saving your song")
+      swal("Please enter a title before saving your song")
     } else {
-      alert("Please sign in to save or load songs")
+      swal("Please sign in to save or load songs")
     }
   }
 
@@ -73,7 +75,7 @@ class Instrument extends React.Component {
         playing: !this.state.playing
       })
     } else if (this.state.recordedNotes.length < 1){
-      alert("There's nothing to play yet. Try recording something first.")
+      swal("There's nothing to play yet. Try recording something first.")
     }
   } 
 
@@ -142,8 +144,14 @@ class Instrument extends React.Component {
       quantizeRecording.totalQuantizedSteps = notesToSequence[last].endTime
       this.playDuet(quantizeRecording)
     } else {
-      alert("You have to record a melody before activating duet mode")
+      swal("You have to record a melody before activating duet mode")
     }
+  }
+
+  handleDuetDuration = (value) => {
+    this.setState({
+      rnnSteps: value
+    })
   }
 
   playDuet = (sequence) => {
@@ -151,7 +159,7 @@ class Instrument extends React.Component {
       this.rnnPlayer.stop()
       return
     } else {
-      let rnnSteps = 128;
+      let rnnSteps = 64;
       let rnnTemp = 1
       this.melodyRNN
       .continueSequence(sequence, rnnSteps, rnnTemp)
@@ -212,7 +220,6 @@ class Instrument extends React.Component {
         render={({ isLoading, playNote, stopNote, stopAllNotes }) => (
           <div>
               <div className="text-center">
-                {/* <p className="">Use the mouse or keyboard to play!</p> */}
               <div style={{ color: '#777' }}>
               </div>
             </div>

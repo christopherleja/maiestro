@@ -1,4 +1,5 @@
 import React from 'react'
+import swal from 'sweetalert';
 
 class SignUpForm extends React.Component {
   state = {
@@ -35,12 +36,12 @@ class SignUpForm extends React.Component {
         this.props.history.push("/home")
       })
       .catch(err => {
-        alert("Looks like that username is already taken. Please try another")
+        swal("Looks like that username is already taken. Please try another")
       })
     } else if (this.state.password === this.state.password_confirmation && this.state.password.length < 6) {
-      alert("Password must be at least 6 characters")
+      swal("Password must be at least 6 characters")
     } else {
-      alert("Passwords don't match")
+      swal("Passwords don't match")
     } 
   }
 

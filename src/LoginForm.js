@@ -1,4 +1,6 @@
 import React from 'react'
+import swal from 'sweetalert';
+
 
 class LoginForm extends React.Component {
   state = {
@@ -34,7 +36,7 @@ class LoginForm extends React.Component {
         this.props.history.push("/home")
       })
       .catch(err => {
-        alert("Something went wrong. Please try again.")
+        swal("Invalid username or password. Please try again.")
       })
     // this is our redirect
   }
