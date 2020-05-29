@@ -11,7 +11,7 @@ import SignupForm from './SignupForm'
 import Navbar from './Navbar'
 
 function App() {
-  const URL = "http://localhost:3000"
+  const URL = "https://maiestro-backend.herokuapp.com/"
   const magentaCheckpoint = "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/melody_rnn"
   const melodyRNN = new mm.MusicRNN(magentaCheckpoint) 
   melodyRNN.initialize()

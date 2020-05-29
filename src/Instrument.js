@@ -147,18 +147,12 @@ class Instrument extends React.Component {
     }
   }
 
-  handleDuetDuration = (value) => {
-    this.setState({
-      rnnSteps: value
-    })
-  }
-
   playDuet = (sequence) => {
     if (this.rnnPlayer.isPlaying()) {
       this.rnnPlayer.stop()
       return
     } else {
-      let rnnSteps = 64;
+      let rnnSteps = 128;
       let rnnTemp = 1
       this.melodyRNN
       .continueSequence(sequence, rnnSteps, rnnTemp)
