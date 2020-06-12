@@ -3,12 +3,14 @@ import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux'
+import Particles from 'react-particles-js'
 import 'react-piano/dist/styles.css';
 import './App.css';
 import InstrumentContainer from './InstrumentContainer'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
 import Navbar from './Navbar'
+
 
 function App() {
   const URL = "https://maiestro-backend.herokuapp.com/"
@@ -41,12 +43,14 @@ function App() {
   return (
     <>
     <Navbar url={URL} currentUser={currentUser} updateCurrentUser={updateCurrentUser}/>
+    
     <Route exact path="/"> 
       <Redirect to="/home" />
     </Route>
     <Route path="/login" render= {routeProps => <LoginForm {...routeProps} updateCurrentUser={updateCurrentUser} url={URL}/>}/>
     <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} updateCurrentUser={updateCurrentUser} url={URL}/>}/>
     <Route path='/home' render = {() => <InstrumentContainer melodyRNN={melodyRNN} rnnPlayer={rnnPlayer} currentUser={currentUser} url={URL}/>} />
+    <Particles />
     </>
   );
     

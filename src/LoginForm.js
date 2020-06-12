@@ -38,7 +38,6 @@ class LoginForm extends React.Component {
       .catch(err => {
         swal("Invalid username or password. Please try again.")
       })
-    // this is our redirect
   }
 
   render() {
