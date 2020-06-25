@@ -128,7 +128,7 @@ class Instrument extends React.Component {
     if (this.state.recordedNotes.length > 0){
       let copy = [...this.state.recordedNotes]
       const notesToSequence = []
-      const magentaRecordings = copy.map(note => {
+      copy.map(note => {
         let newNote = {pitch: note.pitch}
         let newTime = Math.round((note.time * 4) / 4).toFixed(2) 
         newNote.time = Math.round((newTime / 1000) * 4)
@@ -168,7 +168,7 @@ class Instrument extends React.Component {
     } else {
       let copy = [...this.state.recordedNotes]
       let sequence = {notes: [], totalTime: null}
-      let playingNotes = copy.map(note => {
+      copy.map(note => {
         note.duration = (note.endTime - note.time)
         sequence.notes.push({pitch: note.pitch, start: note.time, duration: note.duration})
         return sequence

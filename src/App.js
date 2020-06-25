@@ -44,12 +44,9 @@ function App() {
     <>
     <Navbar url={URL} currentUser={currentUser} updateCurrentUser={updateCurrentUser}/>
     
-    <Route exact path="/"> 
-      <Redirect to="/home" />
-    </Route>
+    <Route path='/' exact render = {() => <InstrumentContainer melodyRNN={melodyRNN} rnnPlayer={rnnPlayer} currentUser={currentUser} url={URL}/>} />
     <Route path="/login" render= {routeProps => <LoginForm {...routeProps} updateCurrentUser={updateCurrentUser} url={URL}/>}/>
     <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} updateCurrentUser={updateCurrentUser} url={URL}/>}/>
-    <Route path='/home' render = {() => <InstrumentContainer melodyRNN={melodyRNN} rnnPlayer={rnnPlayer} currentUser={currentUser} url={URL}/>} />
     <Particles />
     </>
   );
