@@ -33,7 +33,7 @@ class SignUpForm extends React.Component {
       })   
       .then(user => {
         this.props.updateCurrentUser(user)
-        this.props.history.push("/home")
+        this.props.history.push("/")
       })
       .catch(err => {
         swal("Looks like that username is already taken. Please try another")

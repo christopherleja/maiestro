@@ -14,7 +14,7 @@ code {
 
 @font-face {
   font-family: 'lcdnormal';
-  src: url('./css/fonts/LCDN.woff') format('woff2'), url('./css/fonts/LCDN.woff') format('woff');
+  src: url('./fonts/LCDN.woff') format('woff2'), url('./fonts/LCDN.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }

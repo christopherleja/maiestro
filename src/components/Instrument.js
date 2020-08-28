@@ -48,7 +48,7 @@ class Instrument extends React.Component {
       })
       .then(response => response.json())
       .then(song => {
-        console.log('Success:', song);
+        console.log(song);
       })
       .catch((error) => {
         console.error('Error:', error);
