@@ -10,20 +10,20 @@ Front end was built using React, back end with a Rails API. Back end code: https
 How to use:
 
 ```
-#clone backend first
+// clone backend first
 $ git clone git@github.com:christopherleja/maiestro-backend.git
 
-#cd into backend folder
+// cd into backend folder
 $ cd maiestro-backend
 
-#install dependencies and start the server
+// install dependencies and start the server
 $ bundle && rails s
 
-#clone this repository
+// clone this repository
 $ git clone git@github.com:christopherleja/maiestro.git 
 
-#cd into the repository
+// cd into the repository
 $ cd maiestro
 
-#install dependencies and run the app
+// install dependencies and run the app
 $ npm install && npm start
