@@ -1,28 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import swal from 'sweetalert';
 
+import { login } from '../store/userReducer'
 
-class LoginForm extends React.Component {
-  state = {
-    username: "",
-    password: ""
-  }
 
-  handleInputChange = event => {
-    this.setState({
-      [event.target.name]: event.target.value
-    })
-  }
+const LoginForm = (props) => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-  handleSubmit = event => {
+  const dispatch = useDispatch()
+
+  const handleSubmit = event => {
     event.preventDefault()
-    fetch(this.props.url + "/login", {
+    fetch(props.url + "/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         credentials: "include",
-        body: JSON.stringify(this.state)
+        body: JSON.stringify({
+          username,
+          password
+        })
       })
       .then(r => {
         if (r.ok){
@@ -32,29 +32,39 @@ class LoginForm extends React.Component {
         }
       })
       .then(user => {
-        this.props.updateCurrentUser(user)
-        this.props.history.push("/home")
+        dispatch({type: login, payload: user})
+        props.history.push("/")
       })
       .catch(err => {
         swal("Invalid username or password. Please try again.")
       })
   }
 
-  render() {
-    const { username, password } = this.state
-    return (
-      <div className="form-container">
-        <h3>Sign in to your account</h3>
-        <form onSubmit={this.handleSubmit}>
-          <label>Username:</label>
-          <input className="form" type="text" name="username" onChange={this.handleInputChange} value={username} />
-          <label>Password:</label>
-          <input className="form" type="password" name="password" onChange={this.handleInputChange} value={password} />
-          <input className="btn" type="submit" value="Login" />
-        </form>
-      </div>
-    )
-  }
+
+  return (
+    <div className="form-container">
+      <h3>Sign in to your account</h3>
+      <form onSubmit={handleSubmit}>
+        <label>Username:</label>
+        <input 
+          className="form" 
+          type="text" 
+          name="username" 
+          onChange={(e) => setUsername(e.target.value)} 
+          value={username} 
+        />
+        <label>Password:</label>
+        <input 
+          className="form" 
+          type="password" 
+          name="password" 
+          onChange={(e) => setPassword(e.target.value)} 
+          value={password} 
+        />
+        <input className="btn" type="submit" value="Login" />
+      </form>
+    </div>
+  )
 }
 
 export default LoginForm

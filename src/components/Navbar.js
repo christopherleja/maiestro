@@ -1,7 +1,13 @@
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { logout } from '../store/userReducer'
 
-const NavBar = ({ url, currentUser, updateCurrentUser }) => {
+const NavBar = () => {
+
+  const currentUser = useSelector(state => state.user.currentUser);
+  const url = useSelector(state => state.user.url)
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
     fetch(url + "/logout", {
@@ -10,7 +16,7 @@ const NavBar = ({ url, currentUser, updateCurrentUser }) => {
     })
       .then(r => r.json())
       .then(() => {
-        updateCurrentUser(null)
+        dispatch({ type: logout })
       })
   }
 

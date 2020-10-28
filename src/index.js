@@ -10,9 +10,9 @@ import './css/fonts/LCDN.woff'
 
 ReactDOM.render(
   <Router >
-    {/* // <Provider store={store}> */}
+    <Provider store={store}>
       <App />
-    {/* // </Provider>, */}
+    </Provider>,
   </Router >,
   document.getElementById('root')
   );

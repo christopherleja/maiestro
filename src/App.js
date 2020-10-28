@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import { Route } from 'react-router-dom';
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import Particles from 'react-particles-js'
 import 'react-piano/dist/styles.css';
 import './css/App.css';
@@ -9,16 +9,14 @@ import InstrumentContainer from './components/InstrumentContainer'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
 import Navbar from './components/Navbar'
+import { login } from './store/userReducer';
 
 
 function App() {
-  const URL = "http://localhost:3000"
+  const URL = useSelector(state => state.user.url)
+  const currentUser = useSelector(state => state.user.currentUser)
 
-  const [ currentUser, setCurrentUser] = useState(null)
-
-  const updateCurrentUser = (user) => {
-    setCurrentUser(user)
-  }
+  const dispatch = useDispatch()
 
   useEffect(() => {
     fetch(URL + '/autologin', {
@@ -27,7 +25,7 @@ function App() {
     .then(r => r.json())
     .then(user => {
       if (user.username){
-        setCurrentUser(user)
+        dispatch({ type: login, payload: user })
       } else {
         return
       }
@@ -36,32 +34,10 @@ function App() {
 
   return (
     <>
-    <Navbar 
-      url={URL} 
-      currentUser={currentUser} 
-      updateCurrentUser={updateCurrentUser}
-    />
-    
-    <Route path='/' exact render = {() => 
-      <InstrumentContainer 
-        currentUser={currentUser} 
-        url={URL}
-        />} 
-      />
-    <Route path="/login" render= {routeProps => 
-      <LoginForm 
-        {...routeProps} 
-        updateCurrentUser={updateCurrentUser} 
-        url={URL}
-        />}
-      />
-    <Route path="/signup" render= {routeProps => 
-      <SignupForm 
-        {...routeProps} 
-        updateCurrentUser={updateCurrentUser} 
-        url={URL}
-        />}
-      />
+    <Navbar />
+    <Route path='/' exact render={() => <InstrumentContainer />} />
+    <Route path="/login" render= {routeProps => <LoginForm {...routeProps} />} />
+    <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} />} />
     <Particles />
     </>
   );
