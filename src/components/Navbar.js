@@ -1,16 +1,16 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const NavBar = (props) => {
+const NavBar = ({ url, currentUser, updateCurrentUser }) => {
 
   const handleLogout = () => {
-    fetch(props.url + "/logout", {
+    fetch(url + "/logout", {
       method: "POST",
       credentials: "include"
     })
       .then(r => r.json())
       .then(() => {
-        props.updateCurrentUser(null)
+        updateCurrentUser(null)
       })
   }
 
@@ -20,8 +20,9 @@ const NavBar = (props) => {
           <div className="logo">maiestro</div>
         </Link>
         <div className="actions">
-          {props.currentUser ? (
-            <button className="btn" onClick={handleLogout}>Logout {props.currentUser.username}</button>
+          {currentUser ? (
+            <button className="btn" 
+              onClick={handleLogout}>Logout {currentUser.username}</button>
           ) : (
               <>
                 <Link className="link" to="/login">

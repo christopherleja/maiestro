@@ -8,7 +8,7 @@ import PianoConfig from './PianoConfig';
 import swal from 'sweetalert';
 
 
-class Instrument extends React.Component {
+class Instrument extends Component {
   state = {
     recordedNotes: [],
     config: {
@@ -17,11 +17,11 @@ class Instrument extends React.Component {
         first: MidiNumbers.fromNote('c3'),
         last: MidiNumbers.fromNote('c5'),
       },
-      keyboardShortcutOffset: 0,
-      playing: false,
-      time: 0,
-      recording: false,
-      loadedSongs: [],
+    keyboardShortcutOffset: 0,
+    playing: false,
+    time: 0,
+    recording: false,
+    loadedSongs: [],
     },
   };
   
@@ -163,9 +163,8 @@ class Instrument extends React.Component {
   }
 
   handlePlayingRecordedNotes = () => {
-    if (!this.state.playing){
-      return
-    } else {
+    if (!this.state.playing) return
+    else {
       let copy = [...this.state.recordedNotes]
       let sequence = {notes: [], totalTime: null}
       copy.map(note => {
@@ -179,7 +178,7 @@ class Instrument extends React.Component {
     }
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
+  componentDidUpdate = (prevProps) => {
     if (prevProps.song !== this.props.song){
       let updatedConfig = {...this.state.config}
       updatedConfig.instrumentName = this.props.song.tracks[0].instrument 

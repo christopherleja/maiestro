@@ -1,6 +1,6 @@
-import { createStore } from 'redux'
-import reducer from './reducer'
+import { configureStore } from '@reduxjs/toolkit'
+import musicReducer from './musicReducer'
 
-const store = createStore(reducer)
+const store = configureStore({reducer: musicReducer})
 
 export default store

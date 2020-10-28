@@ -1,4 +1,3 @@
-import * as mm from '@magenta/music'
 import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import { Route } from 'react-router-dom';
@@ -14,13 +13,8 @@ import Navbar from './components/Navbar'
 
 function App() {
   const URL = "http://localhost:3000"
-  const magentaCheckpoint = "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/melody_rnn"
-  const melodyRNN = new mm.MusicRNN(magentaCheckpoint) 
-  melodyRNN.initialize()
 
-  const rnnPlayer = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus')
-
-  const [currentUser, setCurrentUser] = useState(null)
+  const [ currentUser, setCurrentUser] = useState(null)
 
   const updateCurrentUser = (user) => {
     setCurrentUser(user)
@@ -42,11 +36,32 @@ function App() {
 
   return (
     <>
-    <Navbar url={URL} currentUser={currentUser} updateCurrentUser={updateCurrentUser}/>
+    <Navbar 
+      url={URL} 
+      currentUser={currentUser} 
+      updateCurrentUser={updateCurrentUser}
+    />
     
-    <Route path='/' exact render = {() => <InstrumentContainer melodyRNN={melodyRNN} rnnPlayer={rnnPlayer} currentUser={currentUser} url={URL}/>} />
-    <Route path="/login" render= {routeProps => <LoginForm {...routeProps} updateCurrentUser={updateCurrentUser} url={URL}/>}/>
-    <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} updateCurrentUser={updateCurrentUser} url={URL}/>}/>
+    <Route path='/' exact render = {() => 
+      <InstrumentContainer 
+        currentUser={currentUser} 
+        url={URL}
+        />} 
+      />
+    <Route path="/login" render= {routeProps => 
+      <LoginForm 
+        {...routeProps} 
+        updateCurrentUser={updateCurrentUser} 
+        url={URL}
+        />}
+      />
+    <Route path="/signup" render= {routeProps => 
+      <SignupForm 
+        {...routeProps} 
+        updateCurrentUser={updateCurrentUser} 
+        url={URL}
+        />}
+      />
     <Particles />
     </>
   );

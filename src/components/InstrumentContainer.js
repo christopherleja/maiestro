@@ -66,8 +66,13 @@ class InstrumentContainer extends React.Component {
     if (this.props.currentUser && this.state.loadedSongs.length > 0){
       return this.state.loadedSongs.map(song => {
       return (
-        <SongBtn key={song.id} song={song} toggleDisplayedButtons={this.toggleDisplayedButtons} 
-        url={this.props.url} currentUser={this.props.currentUser} handleSongLoad={this.handleSongLoad}/>
+        <SongBtn key={song.id} 
+          song={song} 
+          toggleDisplayedButtons={this.toggleDisplayedButtons} 
+          url={this.props.url} 
+          currentUser={this.props.currentUser} 
+          handleSongLoad={this.handleSongLoad}
+        />
       )
     }
   )}
@@ -97,21 +102,32 @@ class InstrumentContainer extends React.Component {
 
   render() {
     const songBtns = this.renderLoadedSongs()
+    const { currentUser, url } = this.props
     return (
       <>
       <div className="container">
         <div className="title-card-container">
-          <input className="title title-card" defaultValue="Untitled" onChange={this.handleTitle} value={this.state.title !== "" ? this.state.title: null}/>
+          <input className="title title-card" 
+            onChange={this.handleTitle} 
+            value={this.state.title}/>
+
           <small className="instructions title-card">
             Use the mouse or keyboard to play. 
             Move shortcuts around by using left and right arrow keys.
           </small>
         </div>
         <Instrument 
-        soundfontHostname={soundfontHostname} audioContext={audioContext} 
-        handleInstrumentChange={this.handleInstrumentChange} currentUser={this.props.currentUser}
-        title={this.state.title} url={this.props.url} loadedSongs={this.state.loadedSongs} 
-        handleLoading={this.handleLoading} song={this.state.song} handleClearLoadedSongs={this.handleClearLoadedSongs}/>
+          soundfontHostname={soundfontHostname} 
+          audioContext={audioContext} 
+          handleInstrumentChange={this.handleInstrumentChange} 
+          currentUser={currentUser}
+          title={this.state.title} 
+          url={url} 
+          loadedSongs={this.state.loadedSongs} 
+          handleLoading={this.handleLoading} 
+          song={this.state.song} 
+          handleClearLoadedSongs={this.handleClearLoadedSongs}
+        />
         </div>
         <div className="mt-5">
         </div>
