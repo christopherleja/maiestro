@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import swal from 'sweetalert';
 
 import { login } from '../store/userReducer'
@@ -10,10 +10,11 @@ const LoginForm = (props) => {
   const [password, setPassword] = useState('')
 
   const dispatch = useDispatch()
+  const url = useSelector(state => state.user.url)
 
   const handleSubmit = event => {
     event.preventDefault()
-    fetch(props.url + "/login", {
+    fetch(url + "/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -32,7 +33,8 @@ const LoginForm = (props) => {
         }
       })
       .then(user => {
-        dispatch({type: login, payload: user})
+        console.log(user)
+        dispatch({type: login.type, payload: user})
         props.history.push("/")
       })
       .catch(err => {

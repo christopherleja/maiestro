@@ -9,12 +9,11 @@ import InstrumentContainer from './components/InstrumentContainer'
 import LoginForm from './components/LoginForm'
 import SignupForm from './components/SignupForm'
 import Navbar from './components/Navbar'
-import { login } from './store/userReducer';
+import { login, logout } from './store/userReducer';
 
 
 function App() {
   const URL = useSelector(state => state.user.url)
-  const currentUser = useSelector(state => state.user.currentUser)
 
   const dispatch = useDispatch()
 
@@ -23,9 +22,9 @@ function App() {
       credentials: 'include'
     })
     .then(r => r.json())
-    .then(user => {
-      if (user.username){
-        dispatch({ type: login, payload: user })
+    .then(res => {
+      if (res){
+        dispatch({ type: login.type, payload: res })
       } else {
         return
       }

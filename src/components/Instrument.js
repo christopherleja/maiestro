@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import * as mm from '@magenta/music'
 import DimensionsProvider from './DimensionsProvider';
@@ -7,99 +8,94 @@ import SoundfontProvider from './SoundfontProvider';
 import PianoConfig from './PianoConfig';
 import swal from 'sweetalert';
 
+import { 
+  addNoteEnd, 
+  addNoteStart, 
+  changeInstrument, 
+  changeTitle, 
+  clearRecordedNotes, 
+  startPlaying, 
+  startRecording, 
+  stopPlaying, 
+  stopRecording,
+  updateConfig, 
+} from '../store/songReducer'
+// import { note } from '@tonaljs/tonal';
 
-class Instrument extends Component {
-  state = {
-    recordedNotes: [],
-    config: {
-      instrumentName: 'acoustic_grand_piano',
-      noteRange: {
-        first: MidiNumbers.fromNote('c3'),
-        last: MidiNumbers.fromNote('c5'),
-      },
-    keyboardShortcutOffset: 0,
-    playing: false,
-    time: 0,
-    recording: false,
-    loadedSongs: [],
-    },
-  };
+
+const Instrument = (props) => {
+  const song = useSelector(state => state.song)
+  const { currentUser, url } = useSelector(state => state.user)
+  const dispatch = useDispatch()
   
-  magentaCheckpoint = "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/melody_rnn"
-  melodyRNN = new mm.MusicRNN(this.magentaCheckpoint) 
-  rnnPlayer = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus')
+  const [ songNotes, setSongNotes ] = useState([])
+
   
-  handleSave = () => {
-    if (this.props.currentUser && this.props.title !== ""){
-    let song = {
-      user_id: this.props.currentUser.id,
-      title: this.props.title,
-      tracks: [],
-      instrument: this.state.config.instrumentName,
-      notes: this.state.recordedNotes
-    }
-    fetch(this.props.url + `/users/${this.props.currentUser.id}/songs`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        },
-      credentials: "include",
-      body: JSON.stringify(song),
-      })
-      .then(response => response.json())
-      .then(song => {
-        console.log(song);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-    } else if (this.props.currentUser && this.props.title === "") {
-      swal("Please enter a title before saving your song")
-    } else {
-      swal("Please sign in to save or load songs")
-    }
+  const magentaCheckpoint = "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/melody_rnn"
+  const melodyRNN = new mm.MusicRNN(magentaCheckpoint) 
+  const rnnPlayer = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus')
+  
+  useEffect(() => {
+    melodyRNN.initialize()
+  }, [])
+
+  const handleSave = () => {
+    if (currentUser && song.title !== ""){
+      let melody = {
+        user_id: currentUser.id,
+        title: song.title,
+        tracks: [],
+        instrument: song.config.instrumentName,
+        notes: song.recordedNotes
+      }
+
+      fetch(url + `/users/${currentUser.id}/songs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          },
+        credentials: "include",
+        body: JSON.stringify(melody),
+        })
+        .then(r => r.json())
+        .then(melody => {
+          console.log(melody);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+
+      } else if (currentUser && song.title === "") {
+        swal("Please enter a title before saving your song")
+      } else {
+        swal("Please sign in to save or load songs")
+      }
   }
 
-  componentDidMount = () => {
-    this.melodyRNN.initialize()
-  }
-
-  handlePlay = () => {
-    if (!this.state.playing && this.state.recordedNotes.length > 1){
-      this.setState({
-        playing: !this.state.playing,
-        time: Date.now()
-      })
-    } else if (this.state.playing) {
-      this.setState({
-        playing: !this.state.playing
-      })
-    } else if (this.state.recordedNotes.length < 1){
+  const handlePlay = () => {
+    if (!song.playing && song.recordedNotes.length > 1){
+      dispatch({ type: startPlaying.type })
+    } else if (song.playing) {
+      dispatch({ type: stopPlaying.type })
+    } else if (song.recordedNotes.length < 1){
       swal("There's nothing to play yet. Try recording something first.")
     }
   } 
 
-  handleRecording = () => {
-    if (!this.state.recording){
-      this.setState({
-        time: Date.now(),
-        recording: !this.state.recording
-      })
-    } else {
-      this.setState({
-        recording: !this.state.recording
-      })
+  const handleRecording = () => {
+    if (!song.recording) dispatch({ type: startRecording.type });
+    else {
+      dispatch({ type: stopRecording.type })    
+      dispatch({ type: addNoteEnd.type, payload: songNotes })
     }
   }
 
-  handleRecordNoteStart = (note) => {
-    this.setState({
-      recordedNotes: [...this.state.recordedNotes.concat(note)]
-    })
+  const handleRecordNoteStart = (note) => {
+    setSongNotes([ ...songNotes, note])
   }
 
-  handleRecordNoteEnd = (noteObj) => {
-    let newNotes = this.state.recordedNotes.map(note => {
+  const handleRecordNoteEnd = (noteObj) => {
+    const newNotes = songNotes.map(note => {
       if (note.pitch === noteObj.pitch && !note.endTime){
         note.endTime = noteObj.endTime
         return note
@@ -107,26 +103,20 @@ class Instrument extends Component {
         return note
       }
     })
-    this.setState({
-      recordedNotes: newNotes
-    })
+    setSongNotes(newNotes)
   }
 
-  stopPlaying = () => {
-    this.setState({
-      playing: false
-    })
+  const pausePlaying = () => {
+    dispatch({ type: stopPlaying.type })
   }
 
-  handleClear = () => {
-    this.setState({
-      recordedNotes: []
-    })
+  const handleClear = () => {
+    dispatch({ type: clearRecordedNotes.type })
   }
 
-  handleDuet = () => {
-    if (this.state.recordedNotes.length > 0){
-      let copy = [...this.state.recordedNotes]
+  const handleDuet = () => {
+    if (song.recordedNotes.length > 0){
+      let copy = [...songNotes ]
       const notesToSequence = []
       copy.map(note => {
         let newNote = {pitch: note.pitch}
@@ -135,133 +125,141 @@ class Instrument extends Component {
         let newEndTime = Math.round((note.endTime * 4) / 4).toFixed(2)
         newNote.endTime = Math.round((newEndTime / 1000) * 4)
         notesToSequence.push(newNote)
-        return notesToSequence
+        // return notesToSequence
       })
       let last = notesToSequence.length - 1
       const quantizeRecording = mm.sequences.quantizeNoteSequence(notesToSequence, 4)
       quantizeRecording.notes = notesToSequence
       quantizeRecording.totalQuantizedSteps = notesToSequence[last].endTime
-      this.playDuet(quantizeRecording)
+      playDuet(quantizeRecording)
     } else {
       swal("You have to record a melody before activating duet mode")
     }
   }
 
-  playDuet = (sequence) => {
+  const playDuet = (sequence) => {
     if (this.rnnPlayer.isPlaying()) {
-      this.rnnPlayer.stop()
-      return
+      return rnnPlayer.stop()
     } else {
       let rnnSteps = 128;
-      let rnnTemp = 1
-      this.melodyRNN
+      let rnnTemp = 1;
+
+      melodyRNN
       .continueSequence(sequence, rnnSteps, rnnTemp)
       .then((sample => {
-        this.rnnPlayer.start(sample)
+        rnnPlayer.start(sample)
       }))
     }
   }
 
-  handlePlayingRecordedNotes = () => {
-    if (!this.state.playing) return
+  const handlePlayingRecordedNotes = () => {
+    if (!song.playing) return
     else {
-      let copy = [...this.state.recordedNotes]
-      let sequence = {notes: [], totalTime: null}
-      copy.map(note => {
-        note.duration = (note.endTime - note.time)
-        sequence.notes.push({pitch: note.pitch, start: note.time, duration: note.duration})
-        return sequence
+      let sequence = { notes: [], totalTime: null }
+      songNotes.map(note => {
+        const duration = note.endTime - note.time;
+        let noteCopy = {
+          pitch: note.pitch,
+          start: note.time,
+          duration: duration
+        }
+        sequence.notes.push(noteCopy)
       })
+
       const lastNote = sequence.notes.length - 1
       sequence.totalTime = sequence.notes[lastNote].start + sequence.notes[lastNote].duration
       return sequence
     }
   }
 
-  componentDidUpdate = (prevProps) => {
-    if (prevProps.song !== this.props.song){
-      let updatedConfig = {...this.state.config}
-      updatedConfig.instrumentName = this.props.song.tracks[0].instrument 
-      this.setState({
-        recordedNotes: this.props.song.notes,
-        config: updatedConfig
-      })
-    }
-  }
+  // useEffect(() => {
+    
+  // })
 
-  render() {
-    const keyboardShortcuts = KeyboardShortcuts.create({
-      firstNote: this.state.config.noteRange.first + this.state.config.keyboardShortcutOffset,
-      lastNote: this.state.config.noteRange.last + this.state.config.keyboardShortcutOffset,
-      keyboardConfig: KeyboardShortcuts.HOME_ROW,
-    });
-    const loaded = this.props.loadedSongs.length > 0 
-    return (
-      <SoundfontProvider
-        time={this.state.time}
-        stopPlaying={this.stopPlaying}
-        recording={this.state.recording}
-        recordedNotes={this.state.recordedNotes}
-        handleInstrumentChange={this.props.handleInstrumentChange}
-        handleRecordNoteStart={this.handleRecordNoteStart}
-        handleRecordNoteEnd={this.handleRecordNoteEnd}
-        handlePlayingRecordedNotes={this.handlePlayingRecordedNotes}
-        audioContext={this.props.audioContext}
-        instrumentName={this.state.config.instrumentName}
-        hostname={this.props.soundfontHostname}
-        render={({ isLoading, playNote, stopNote, stopAllNotes }) => (
-          <div>
-              <div className="text-center">
-              <div style={{ color: '#777' }}>
-              </div>
-            </div>
-            <div className="btn-container">
-              <button className="instrument-btn" onClick={this.handlePlay}>{this.state.playing ? "Stop" : "Play" }</button>
-              <button className="instrument-btn" onClick={this.handleRecording}>{this.state.recording ? "Stop" : "Record" }</button>
-              <button className="instrument-btn" onClick={this.handleClear}>Clear</button>
-              <button className="instrument-btn" onClick={this.handleDuet}>Duet</button>
-              <button className="instrument-btn" onClick={this.handleSave}>Save</button>
-              <button className="instrument-btn" onClick={loaded ? this.props.handleClearLoadedSongs : this.props.handleLoading}>{loaded ? "Clear Loaded" : "Load"}</button>
-            </div>
-            <div className="mt-4">
-              <DimensionsProvider>
-                {({ containerWidth }) => (
-                  <Piano
-                    noteRange={this.state.config.noteRange}
-                    keyboardShortcuts={keyboardShortcuts}
-                    playNote={playNote}
-                    stopNote={stopNote}
-                    disabled={isLoading}
-                    width={containerWidth}
-                  />
-                )}
-              </DimensionsProvider>
-            </div>
-            <div className="row mt-5">
-              <div className="col-lg-8 offset-lg-2">
-                <InstrumentListProvider
-                  hostname={this.props.soundfontHostname}
-                  render={(instrumentList) => (
-                    <PianoConfig
-                      config={this.state.config}
-                      setConfig={(config) => {
-                        this.setState({
-                          config: Object.assign({}, this.state.config, config),
-                        });
-                        stopAllNotes();
-                      }}
-                      instrumentList={instrumentList || [this.state.config.instrumentName]}
-                      keyboardShortcuts={keyboardShortcuts}
-                    />
-                  )}
-                />
-              </div>
+  // const componentDidUpdate = (prevProps) => {
+  //   if (prevProps.song !== this.props.song){
+  //     let updatedConfig = {...this.state.config}
+  //     updatedConfig.instrumentName = this.props.song.tracks[0].instrument 
+  //     this.setState({
+  //       recordedNotes: this.props.song.notes,
+  //       config: updatedConfig
+  //     })
+  //   }
+  // }
+
+  const keyboardShortcuts = KeyboardShortcuts.create({
+    firstNote: song.config.noteRange.first + song.config.keyboardShortcutOffset,
+    lastNote: song.config.noteRange.last + song.config.keyboardShortcutOffset,
+    keyboardConfig: KeyboardShortcuts.HOME_ROW,
+  });
+  const loaded = props.loadedSongs.length > 0 
+
+  return (
+    <SoundfontProvider
+      time={song.time}
+      stopPlaying={stopPlaying}
+      recording={song.recording}
+      recordedNotes={song.recordedNotes}
+      handleInstrumentChange={props.handleInstrumentChange}
+      handleRecordNoteStart={handleRecordNoteStart}
+      handleRecordNoteEnd={handleRecordNoteEnd}
+      handlePlayingRecordedNotes={handlePlayingRecordedNotes}
+      audioContext={props.audioContext}
+      instrumentName={song.config.instrumentName}
+      hostname={props.soundfontHostname}
+      playing={song.playing}
+      render={({ isLoading, playNote, stopNote, stopAllNotes }) => (
+        <div>
+            <div className="text-center">
+            <div style={{ color: '#777' }}>
             </div>
           </div>
-        )}
-      />
-    );
-  }
+          <div className="btn-container">
+            <button className="instrument-btn" onClick={handlePlay}>{song.playing ? "Stop" : "Play" }</button>
+            <button className="instrument-btn" onClick={handleRecording}>{song.recording ? "Stop" : "Record" }</button>
+            <button className="instrument-btn" onClick={handleClear}>Clear</button>
+            <button className="instrument-btn" onClick={handleDuet}>Duet</button>
+            <button className="instrument-btn" onClick={handleSave}>Save</button>
+            <button className="instrument-btn" onClick={loaded ? props.handleClearLoadedSongs : props.handleLoading}>{loaded ? "Clear Loaded" : "Load"}</button>
+          </div>
+          <div className="mt-4">
+            <DimensionsProvider>
+              {({ containerWidth }) => (
+                <Piano
+                  noteRange={song.config.noteRange}
+                  keyboardShortcuts={keyboardShortcuts}
+                  playNote={playNote}
+                  stopNote={stopNote}
+                  disabled={isLoading}
+                  width={containerWidth}
+                />
+              )}
+            </DimensionsProvider>
+          </div>
+          <div className="row mt-5">
+            <div className="col-lg-8 offset-lg-2">
+              <InstrumentListProvider
+                hostname={props.soundfontHostname}
+                render={(instrumentList) => (
+                  <PianoConfig
+                    config={song.config}
+                    setConfig={(config) => {
+                      dispatch({type: updateConfig, payload: Object.assign({}, song.config, config),
+                      });
+                      stopAllNotes();
+                    }}
+                    instrumentList={instrumentList || [song.config.instrumentName]}
+                    keyboardShortcuts={keyboardShortcuts}
+                  />
+                )}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    />
+  );
 }
+
 
 export default Instrument;

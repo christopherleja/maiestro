@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-import musicReducer from './musicReducer'
+import songReducer from './songReducer'
 import userReducer from './userReducer'
 
 const reducer = {
-  music: musicReducer, 
+  song: songReducer, 
   user: userReducer
 }
 
