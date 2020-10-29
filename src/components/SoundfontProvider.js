@@ -8,7 +8,7 @@ import { stopPlaying } from '../store/songReducer'
 const SoundfontProvider = (props) => {
   const format = 'mp3';
   const soundfont = 'MusyngKite';
-  const instrumentName = useSelector(state => state.song.config.instrumentName )
+  const instrumentName = useSelector(state => state.song.config.instrumentName)
   const dispatch = useDispatch();
 
   // let activeAudioNodes = {};
@@ -16,7 +16,7 @@ const SoundfontProvider = (props) => {
   const [ activeAudioNodes, setActiveAudioNodes ] = useState({})
   const [ instrument, setInstrument ] = useState(null)
   const song = useSelector(state => state.song)
-  // const activeAudioNodes = useSelector(state => state.song.config.activeAudioNodes)
+  // const AAN = useSelector(state => state.song.activeAudioNodes)
 
 const loadInstrument = () => {
     // Re-trigger loading state
@@ -45,36 +45,36 @@ const loadInstrument = () => {
       const start = Date.now() - song.time
       resumeAudio().then(() => {
         const audioNode = instrument.play(midiNumber);
-
-        setActiveAudioNodes({
-          ...activeAudioNodes, [midiNumber]: audioNode
-        })
-        // console.log(activeAudioNodes)
+        
+        // const copy = {...activeAudioNodes, [midiNumber]: audioNode}
+        setActiveAudioNodes(Object.assign(activeAudioNodes, { [midiNumber]: audioNode }))
+          
         if (song.recording){
-          let note = { pitch: midiNumber, start }
+          const note = { pitch: midiNumber, start }
           props.handleRecordNoteStart(note)
         } 
       });
     };
 
     const stopNote = (midiNumber) => {
+      // console.log(activeAudioNodes[midiNumber])
       resumeAudio().then(() => {
         if (!activeAudioNodes[midiNumber]) {
-          return;
-        }
-        let audioNode = activeAudioNodes[midiNumber];
+          return
+        };
+        const audioNode = activeAudioNodes[midiNumber];
         audioNode.stop();
-        let copy = {...activeAudioNodes};
-        copy[midiNumber] = null;
-        setActiveAudioNodes({...activeAudioNodes, ...copy });
+        // const copy = { ...activeAudioNodes, [midiNumber]: null };
+        setActiveAudioNodes(Object.assign(activeAudioNodes, { [midiNumber]: null }));
       });
-      if (song.recording){
-        const endTime = Date.now() - song.time
-        const note = { pitch: midiNumber, endTime }
-        props.handleRecordNoteEnd(note)
-      } else {
-        return
-      }
+          
+        if (song.recording){
+            const endTime = Date.now() - song.time
+            const note = { pitch: midiNumber, endTime }
+            props.handleRecordNoteEnd(note)
+          } else {
+            return
+          }
     };
 
       // Clear any residual notes that don't get called with stopNote
@@ -86,7 +86,6 @@ const loadInstrument = () => {
             node.stop();
             }
         });
-        setActiveAudioNodes({})
         });
     };
 
@@ -100,6 +99,8 @@ const loadInstrument = () => {
     }, note.start)
   }
 
+  useEffect(() => console.log(activeAudioNodes), [activeAudioNodes])
+
   const delayStop = (note) => {
     setTimeout(() => {
       stopNote(note.pitch)
@@ -107,20 +108,22 @@ const loadInstrument = () => {
   }
 
   const handlePlayback = (noteArr) => {
+    // setActiveAudioNodes(Object)
     if (noteArr){
-      noteArr.notes.map(note => {
+      return noteArr.notes.map(note => {
         delayPlay(note);
         delayStop(note);
       })
+    }
       return setTimeout(() => {
         dispatch({ type: stopPlaying.type })
-      }, noteArr.totalTime)
-    }
+      }, noteArr.totalTime ? noteArr.totalTime : 0)
   }
 
   useEffect(() => {
     if (song.playing){
-      
+      setActiveAudioNodes({})
+      console.log(activeAudioNodes)
       let scheduledNotes = props.handlePlayingRecordedNotes();
       if (scheduledNotes){
         handlePlayback(scheduledNotes);

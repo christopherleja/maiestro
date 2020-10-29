@@ -10,8 +10,8 @@ const initialState = {
         last: MidiNumbers.fromNote('c5'),
       },
       keyboardShortcutOffset: 0,
-      activeAudioNodes: {},
     },
+    activeAudioNodes: {},
     playing: false,
     time: 0,
     recording: false,
@@ -57,10 +57,10 @@ const song = createSlice({
       state.config = action.payload
     },
     // addActiveAudioNode: (state, action) => {
-    //   state.config.activeAudioNodes[action.payload.key] = action.payload.value
+    //   state.activeAudioNodes[action.payload.key] = action.payload.value
     // },
     // setActiveAudioNode: (state, action) => {
-    //   state.config.activeAudioNodes = {}
+    //   state.activeAudioNodes = action.payload
     // }
   },
 })
