@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { logout } from '../store/userReducer'
+import { logout } from '../../store/userReducer'
 
 const NavBar = () => {
 
@@ -16,7 +16,7 @@ const NavBar = () => {
     })
       .then(r => r.json())
       .then(() => {
-        dispatch({ type: logout })
+        dispatch({ type: logout.type })
       })
   }
 

@@ -1,15 +1,14 @@
 import React, { useEffect} from 'react';
-import ReactDOM from 'react-dom';
 import { Route } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
 import Particles from 'react-particles-js'
 import 'react-piano/dist/styles.css';
 import './css/App.css';
 import InstrumentContainer from './components/InstrumentContainer'
-import LoginForm from './components/LoginForm'
-import SignupForm from './components/SignupForm'
-import Navbar from './components/Navbar'
-import { login, logout } from './store/userReducer';
+import LoginForm from './components/user/LoginForm'
+import SignupForm from './components/user/SignupForm'
+import Navbar from './components/user/Navbar'
+import { login } from './store/userReducer';
 
 
 function App() {
@@ -17,7 +16,7 @@ function App() {
 
   const dispatch = useDispatch()
 
-  useEffect(() => {
+  const autoLogin = () => {
     fetch(URL + '/autologin', {
       credentials: 'include'
     })
@@ -26,9 +25,13 @@ function App() {
       if (res){
         dispatch({ type: login.type, payload: res })
       } else {
-        return
+        return null;
       }
     })
+  }
+
+  useEffect(() => {
+    autoLogin()
   }, [])
 
   return (

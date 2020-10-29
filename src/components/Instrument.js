@@ -73,7 +73,7 @@ const Instrument = (props) => {
   }
 
   const handlePlay = () => {
-    if (!song.playing && song.recordedNotes.length > 1){
+    if (!song.playing && song.recordedNotes.length >= 1){
       dispatch({ type: startPlaying.type })
     } else if (song.playing) {
       dispatch({ type: stopPlaying.type })
@@ -98,6 +98,7 @@ const Instrument = (props) => {
     const newNotes = songNotes.map(note => {
       if (note.pitch === noteObj.pitch && !note.endTime){
         note.endTime = noteObj.endTime
+        note.duration = note.endTime - note.start;
         return note
       } else {
         return note
@@ -115,22 +116,24 @@ const Instrument = (props) => {
   }
 
   const handleDuet = () => {
-    if (song.recordedNotes.length > 0){
+    if (songNotes.length > 0){
       let copy = [...songNotes ]
       const notesToSequence = []
       copy.map(note => {
         let newNote = {pitch: note.pitch}
-        let newTime = Math.round((note.time * 4) / 4).toFixed(2) 
+        let newTime = Math.round((note.start * 4) / 4).toFixed(2) 
         newNote.time = Math.round((newTime / 1000) * 4)
         let newEndTime = Math.round((note.endTime * 4) / 4).toFixed(2)
         newNote.endTime = Math.round((newEndTime / 1000) * 4)
         notesToSequence.push(newNote)
-        // return notesToSequence
+        return notesToSequence
       })
+
       let last = notesToSequence.length - 1
       const quantizeRecording = mm.sequences.quantizeNoteSequence(notesToSequence, 4)
       quantizeRecording.notes = notesToSequence
       quantizeRecording.totalQuantizedSteps = notesToSequence[last].endTime
+      console.log(quantizeRecording)
       playDuet(quantizeRecording)
     } else {
       swal("You have to record a melody before activating duet mode")
@@ -138,7 +141,7 @@ const Instrument = (props) => {
   }
 
   const playDuet = (sequence) => {
-    if (this.rnnPlayer.isPlaying()) {
+    if (rnnPlayer.isPlaying()) {
       return rnnPlayer.stop()
     } else {
       let rnnSteps = 128;
@@ -155,19 +158,10 @@ const Instrument = (props) => {
   const handlePlayingRecordedNotes = () => {
     if (!song.playing) return
     else {
-      let sequence = { notes: [], totalTime: null }
-      songNotes.map(note => {
-        const duration = note.endTime - note.time;
-        let noteCopy = {
-          pitch: note.pitch,
-          start: note.time,
-          duration: duration
-        }
-        sequence.notes.push(noteCopy)
-      })
-
+      let sequence = { notes: [...songNotes], totalTime: null }
+      
       const lastNote = sequence.notes.length - 1
-      sequence.totalTime = sequence.notes[lastNote].start + sequence.notes[lastNote].duration
+      sequence.totalTime = sequence.notes[lastNote].end
       return sequence
     }
   }
@@ -196,18 +190,13 @@ const Instrument = (props) => {
 
   return (
     <SoundfontProvider
-      time={song.time}
-      stopPlaying={stopPlaying}
-      recording={song.recording}
-      recordedNotes={song.recordedNotes}
+      stopPlaying={pausePlaying}
       handleInstrumentChange={props.handleInstrumentChange}
       handleRecordNoteStart={handleRecordNoteStart}
       handleRecordNoteEnd={handleRecordNoteEnd}
       handlePlayingRecordedNotes={handlePlayingRecordedNotes}
       audioContext={props.audioContext}
-      instrumentName={song.config.instrumentName}
       hostname={props.soundfontHostname}
-      playing={song.playing}
       render={({ isLoading, playNote, stopNote, stopAllNotes }) => (
         <div>
             <div className="text-center">
@@ -244,7 +233,7 @@ const Instrument = (props) => {
                   <PianoConfig
                     config={song.config}
                     setConfig={(config) => {
-                      dispatch({type: updateConfig, payload: Object.assign({}, song.config, config),
+                      dispatch({type: updateConfig.type, payload: Object.assign({}, song.config, config),
                       });
                       stopAllNotes();
                     }}

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import swal from 'sweetalert';
 
-import { login } from '../store/userReducer'
+import { login } from '../../store/userReducer'
 
 
 const LoginForm = (props) => {

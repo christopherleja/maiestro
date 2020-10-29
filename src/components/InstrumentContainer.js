@@ -1,6 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import _ from 'lodash';
 import 'react-piano/dist/styles.css';
 import Instrument from './Instrument';
 import SongBtn from './SongBtn'
@@ -46,7 +44,7 @@ class InstrumentContainer extends React.Component {
           userSongs.push(song)
           return userSongs
         } else {
-          return
+          return []
         }
       })
       this.setState({
@@ -86,12 +84,12 @@ class InstrumentContainer extends React.Component {
 
   toggleDisplayedButtons = (id) => {
     let updatedLoadedSongs = this.state.loadedSongs.filter(song => {
-      if (song.id !== id)
-      return song
+      if (song.id !== id) return song
     })
       this.setState({
         loadedSongs: updatedLoadedSongs
       })
+    return;
   }
 
   handleTitle = (event) => {
@@ -109,8 +107,10 @@ class InstrumentContainer extends React.Component {
         <div className="title-card-container">
           <input className="title title-card" 
             onChange={this.handleTitle} 
-            value={this.state.title}/>
-
+            value={this.state.title}
+            placeholder="Untitled"
+            />
+  
           <small className="instructions title-card">
             Use the mouse or keyboard to play. 
             Move shortcuts around by using left and right arrow keys.
