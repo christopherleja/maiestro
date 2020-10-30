@@ -9,10 +9,7 @@ import PianoConfig from './PianoConfig';
 import swal from 'sweetalert';
 
 import { 
-  addNoteEnd, 
-  addNoteStart, 
-  changeInstrument, 
-  changeTitle, 
+  addRecordedNotes, 
   clearRecordedNotes, 
   startPlaying, 
   startRecording, 
@@ -46,7 +43,7 @@ const Instrument = (props) => {
         title: song.title,
         tracks: [],
         instrument: song.config.instrumentName,
-        notes: song.recordedNotes
+        notes: song.recordedNotes.notes
       }
 
       fetch(url + `/users/${currentUser.id}/songs`, {
@@ -73,20 +70,28 @@ const Instrument = (props) => {
   }
 
   const handlePlay = () => {
-    if (!song.playing && song.recordedNotes.length >= 1){
+    if (!song.recordedNotes.totalTime){
+      return swal("There's nothing to play yet. Try recording something first.")
+    }
+    if (!song.playing){
       dispatch({ type: startPlaying.type })
     } else if (song.playing) {
       dispatch({ type: stopPlaying.type })
-    } else if (song.recordedNotes.length < 1){
-      swal("There's nothing to play yet. Try recording something first.")
-    }
+    } 
   } 
 
   const handleRecording = () => {
     if (!song.recording) dispatch({ type: startRecording.type });
     else {
+      let last = songNotes.length - 1
+      let totalTime = songNotes[last].endTime
       dispatch({ type: stopRecording.type })    
-      dispatch({ type: addNoteEnd.type, payload: songNotes })
+      dispatch({ type: addRecordedNotes.type, 
+        payload: {
+          notes: songNotes,
+          totalTime: totalTime
+        }
+      })
     }
   }
 
@@ -113,15 +118,16 @@ const Instrument = (props) => {
 
   const handleClear = () => {
     dispatch({ type: clearRecordedNotes.type })
+    setSongNotes([])
   }
 
   const handleDuet = () => {
-    if (songNotes.length > 0){
+    if (songNotes.length){
       let copy = [...songNotes ]
       const notesToSequence = []
       copy.map(note => {
         let newNote = {pitch: note.pitch}
-        let newTime = Math.round((note.start * 4) / 4).toFixed(2) 
+        let newTime = Math.round((note.time * 4) / 4).toFixed(2) 
         newNote.time = Math.round((newTime / 1000) * 4)
         let newEndTime = Math.round((note.endTime * 4) / 4).toFixed(2)
         newNote.endTime = Math.round((newEndTime / 1000) * 4)
@@ -155,46 +161,19 @@ const Instrument = (props) => {
     }
   }
 
-  const handlePlayingRecordedNotes = () => {
-    if (!song.playing) return
-    else {
-      let sequence = { notes: [...songNotes], totalTime: null }
-      
-      const lastNote = sequence.notes.length - 1
-      sequence.totalTime = sequence.notes[lastNote].end
-      return sequence
-    }
-  }
-
-  // useEffect(() => {
-    
-  // })
-
-  // const componentDidUpdate = (prevProps) => {
-  //   if (prevProps.song !== this.props.song){
-  //     let updatedConfig = {...this.state.config}
-  //     updatedConfig.instrumentName = this.props.song.tracks[0].instrument 
-  //     this.setState({
-  //       recordedNotes: this.props.song.notes,
-  //       config: updatedConfig
-  //     })
-  //   }
-  // }
-
   const keyboardShortcuts = KeyboardShortcuts.create({
     firstNote: song.config.noteRange.first + song.config.keyboardShortcutOffset,
     lastNote: song.config.noteRange.last + song.config.keyboardShortcutOffset,
     keyboardConfig: KeyboardShortcuts.HOME_ROW,
   });
-  const loaded = props.loadedSongs.length > 0 
+  const loaded = props.loadedSongs.length 
 
   return (
     <SoundfontProvider
-      stopPlaying={pausePlaying}
+      pausePlaying={pausePlaying}
       handleInstrumentChange={props.handleInstrumentChange}
       handleRecordNoteStart={handleRecordNoteStart}
       handleRecordNoteEnd={handleRecordNoteEnd}
-      handlePlayingRecordedNotes={handlePlayingRecordedNotes}
       audioContext={props.audioContext}
       hostname={props.soundfontHostname}
       render={({ isLoading, playNote, stopNote, stopAllNotes }) => (

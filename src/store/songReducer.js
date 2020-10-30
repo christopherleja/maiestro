@@ -2,7 +2,10 @@ import { MidiNumbers } from 'react-piano';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    recordedNotes: [],
+    recordedNotes: {
+      notes: [],
+      totalTime: null
+    },
     config: {
       instrumentName: 'acoustic_grand_piano',
       noteRange: {
@@ -24,55 +27,75 @@ const song = createSlice({
   name: "song",
   initialState,
   reducers: {
-    addNoteEnd: (state, action) => {
-      state.recordedNotes = action.payload
-    }, 
+    addRecordedNotes: (state, action) => {
+      state.recordedNotes.notes = action.payload.notes
+      state.recordedNotes.totalTime = action.payload.totalTime
+    },
+    
     addNoteStart: (state, action) => {
       state.recordedNotes.push(action.payload)
     },
+
     changeInstrument: (state, action) => {
       state.config.instrumentName = action.payload
     },
+
     changeTitle: (state, action) => {
       state.title = action.payload
     },
-    clearRecordedNotes: (state, action) => {
-      state.recordedNotes = []
+
+    clearLoadedSongs: (state, action) => {
+      state.loadedSongs = []
     },
+
+    clearRecordedNotes: (state, action) => {
+      state.recordedNotes.notes = []
+      state.recordedNotes.totalTime = null
+    },
+
+    loadAllSongs: (state, action) => {
+      state.loadedSongs = action.payload
+    }, 
+
+    loadSong: (state, action) => {
+      state.recordedNotes = { notes: action.payload.notes, totalTime: action.payload.totalTime }
+      state.config.instrumentName = action.payload.instrument
+      state.title = action.payload.title
+    },
+
     startRecording: (state, action) => {
       state.time = Date.now();
       state.recording = true;
     },
+
     stopRecording: (state, action) => {
       state.recording = false;
     },
+
     startPlaying: (state, action) => {
       state.playing = true;
       state.time = Date.now();
     },
+
     stopPlaying: (state, action) => {
       state.playing = false
     },
+
     updateConfig: (state, action) => {
       state.config = action.payload
     },
-    // addActiveAudioNode: (state, action) => {
-    //   state.activeAudioNodes[action.payload.key] = action.payload.value
-    // },
-    // setActiveAudioNode: (state, action) => {
-    //   state.activeAudioNodes = action.payload
-    // }
   },
 })
 
 export const {
-  // addActiveAudioNode,
-  addNoteEnd,
+  addRecordedNotes,
   addNoteStart,
   changeInstrument,
   changeTitle,
+  clearLoadedSongs,
   clearRecordedNotes,
-  // setActiveAudioNode,
+  loadAllSongs,
+  loadSong,
   startRecording,
   startPlaying,
   stopRecording,

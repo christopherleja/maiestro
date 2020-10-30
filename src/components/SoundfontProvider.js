@@ -5,6 +5,14 @@ import Soundfont from 'soundfont-player';
 import { stopPlaying } from '../store/songReducer'
 
 const SoundfontProvider = (props) => {
+
+  const { 
+    handleInstrumentChange, 
+    handleRecordNoteStart, 
+    handleRecordNoteEnd,
+    audioContext,
+    hostname,
+  } = props
   // To do: Refactor these into a separate environmental variables file
   const format = 'mp3';
   const soundfont = 'MusyngKite';
@@ -17,6 +25,7 @@ const SoundfontProvider = (props) => {
 
   // activeAudioNotes has to stay in local state, not redux, 
   // since it uses functions as values in the playnote function
+  // fortunately, I only use it in this component anyway.
   const [ activeAudioNodes, setActiveAudioNodes ] = useState({})
 
   // to do: refactor this into redux
@@ -25,21 +34,21 @@ const SoundfontProvider = (props) => {
   const loadInstrument = () => {
       // Re-trigger loading state
       setInstrument(null);
-        Soundfont.instrument(props.audioContext, instrumentName, {
+        Soundfont.instrument(audioContext, instrumentName, {
         format,
         soundfont,
         nameToUrl: (name, soundfont, format) => {
-            return `${props.hostname}/${soundfont}/${name}-${format}.js`;
+            return `${hostname}/${soundfont}/${name}-${format}.js`;
         },
         }).then(instrument => {
-        props.handleInstrumentChange(instrument)
+        handleInstrumentChange(instrument)
         setInstrument(instrument)
       })
     }
 
   const resumeAudio = () => {
-      if (props.audioContext.state === 'suspended') {
-        return props.audioContext.resume();
+      if (audioContext.state === 'suspended') {
+        return audioContext.resume();
       } else {
         return Promise.resolve();
       }
@@ -56,8 +65,8 @@ const SoundfontProvider = (props) => {
       
       if (song.recording){
         // if recording, save note for posterity
-        const note = { pitch: midiNumber, start }
-        props.handleRecordNoteStart(note)
+        const note = { pitch: midiNumber, time: start }
+        handleRecordNoteStart(note)
       } 
   };
 
@@ -77,13 +86,14 @@ const SoundfontProvider = (props) => {
         // find and save end time, add that to existing note objects array
         const endTime = Date.now() - song.time
         const note = { pitch: midiNumber, endTime }
-        props.handleRecordNoteEnd(note)
+
+        handleRecordNoteEnd(note)
       } 
   };
 
   // Clear any residual notes that don't get called with stopNote
   const stopAllNotes = () => {
-    props.audioContext.resume().then(() => {
+    audioContext.resume().then(() => {
     const activeNodes = Object.values(activeAudioNodes);
     activeNodes.forEach(node => {
         if (node) node.stop();
@@ -96,32 +106,39 @@ const SoundfontProvider = (props) => {
     loadInstrument(instrumentName)
   }, [instrumentName])
 
-  const handlePlayback = (noteArr) => {
-    if (noteArr){
+  const handlePlayback = () => {
+    const { notes, totalTime } = song.recordedNotes
+    if (notes.length){
       // delay playing note until the right time
-      return noteArr.notes.map(note => {
+      return notes.map(note => {
         setTimeout(() => {
           playNote(note.pitch)
-        }, note.start);
+        }, note.time);
         
         // and delay stopping it until the right moment
         setTimeout(() => {
           stopNote(note.pitch)
         }, note.endTime);
-      })
+        
+        // reset play button when the melody ends
+        setTimeout(() => {
+          dispatch({ type: stopPlaying.type })
+        }, totalTime)
+
+        setTimeout(() => {
+          setActiveAudioNodes({})
+        }, totalTime)
+      }) 
     }
-      return setTimeout(() => {
-        dispatch({ type: stopPlaying.type })
-      }, noteArr.totalTime)
   }
 
   useEffect(() => {
     if (song.playing){
-      let scheduledNotes = props.handlePlayingRecordedNotes();
-      if (scheduledNotes){
-        handlePlayback(scheduledNotes);
-      }
-  } else return
+      if (song.recordedNotes.totalTime){
+        handlePlayback();
+      } else 
+        return
+  }
   }, [song.playing])
 
     return props.render({

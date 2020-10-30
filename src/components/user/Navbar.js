@@ -2,11 +2,11 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { logout } from '../../store/userReducer'
+import { clearLoadedSongs, clearRecordedNotes } from '../../store/songReducer'
 
 const NavBar = () => {
 
-  const currentUser = useSelector(state => state.user.currentUser);
-  const url = useSelector(state => state.user.url)
+  const {currentUser, url} = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -17,6 +17,8 @@ const NavBar = () => {
       .then(r => r.json())
       .then(() => {
         dispatch({ type: logout.type })
+        dispatch({ type: clearRecordedNotes.type })
+        dispatch({ type: clearLoadedSongs.type })
       })
   }
 
