@@ -20,8 +20,15 @@ const initialState = {
     recording: false,
     loadedSongs: [],
     title: "",
+    isLoading: false,
+    constants: {
+      soundfontHostname: 'https://d1pzp51pvbm36p.cloudfront.net',
+      format: 'mp3',
+      soundfont: 'MusyngKite',
+    }
 }
 
+export const audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
 const song = createSlice({
   name: "song",
@@ -81,6 +88,10 @@ const song = createSlice({
       state.playing = false
     },
 
+    toggleIsLoading: (state, action) => {
+      state.isLoading = action.payload
+    },
+
     updateConfig: (state, action) => {
       state.config = action.payload
     },
@@ -100,6 +111,7 @@ export const {
   startPlaying,
   stopRecording,
   stopPlaying,
+  toggleIsLoading,
   updateConfig
 } = song.actions
 export default song.reducer;

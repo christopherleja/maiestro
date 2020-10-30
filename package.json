@@ -24,6 +24,7 @@
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-spinkit": "^3.0.0",
     "redux": "^4.0.5",
     "sine-waves": "^0.3.0",
     "soundfont-player": "^0.12.0",

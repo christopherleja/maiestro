@@ -2,42 +2,45 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import * as mm from '@magenta/music'
-import DimensionsProvider from './DimensionsProvider';
-import InstrumentListProvider from './InstrumentListProvider';
-import SoundfontProvider from './SoundfontProvider';
-import PianoConfig from './PianoConfig';
+import DimensionsProvider from '../DimensionsProvider';
+import InstrumentListProvider from '../InstrumentListProvider';
+import SoundfontProvider from '../SoundfontProvider';
+import PianoConfig from '../PianoConfig';
 import swal from 'sweetalert';
 
 import { 
   addRecordedNotes, 
+  clearLoadedSongs, 
   clearRecordedNotes, 
   startPlaying, 
   startRecording, 
   stopPlaying, 
   stopRecording,
-  updateConfig, 
-} from '../store/songReducer'
-// import { note } from '@tonaljs/tonal';
+  toggleIsLoading,
+  updateConfig 
+} from '../../store/songReducer'
 
 
 const Instrument = (props) => {
-  const song = useSelector(state => state.song)
-  const { currentUser, url } = useSelector(state => state.user)
+  const { song, user: { currentUser, url }} = useSelector(state => state)
   const dispatch = useDispatch()
   
+  // initially stores recorded notes that will get sent to store when completed
   const [ songNotes, setSongNotes ] = useState([])
 
-  
+  // to do: export to ENV variables file
+  // magentaCheckpoint is the api checkpoint maiestro connects to
   const magentaCheckpoint = "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/melody_rnn"
+  // melodyRNN will handle interactions with the neural network
   const melodyRNN = new mm.MusicRNN(magentaCheckpoint) 
+  // rnnPlayer will play the sequence maiestro gets back from melodyRNN
   const rnnPlayer = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus')
-  
-  useEffect(() => {
-    melodyRNN.initialize()
-  }, [])
 
+  // to do: separate fetches to separate file/maybe use axios? Make this less ugly
   const handleSave = () => {
-    if (currentUser && song.title !== ""){
+    // make sure song object is eligible to be saved
+    if (currentUser && song.title.length){
+      
       let melody = {
         user_id: currentUser.id,
         title: song.title,
@@ -55,14 +58,13 @@ const Instrument = (props) => {
         body: JSON.stringify(melody),
         })
         .then(r => r.json())
-        .then(melody => {
-          console.log(melody);
+        .then(res => {
+          swal(`${res.title} was saved successfully`);
         })
-        .catch((error) => {
-          console.error('Error:', error);
+        .catch((err) => {
+          swal(`There was an issue saving ${song.title}. Please try again`);
         });
-
-      } else if (currentUser && song.title === "") {
+      } else if (currentUser && !song.title.length) {
         swal("Please enter a title before saving your song")
       } else {
         swal("Please sign in to save or load songs")
@@ -86,7 +88,8 @@ const Instrument = (props) => {
       let last = songNotes.length - 1
       let totalTime = songNotes[last].endTime
       dispatch({ type: stopRecording.type })    
-      dispatch({ type: addRecordedNotes.type, 
+      dispatch({ 
+        type: addRecordedNotes.type, 
         payload: {
           notes: songNotes,
           totalTime: totalTime
@@ -96,10 +99,12 @@ const Instrument = (props) => {
   }
 
   const handleRecordNoteStart = (note) => {
+    // adds new note with start time
     setSongNotes([ ...songNotes, note])
   }
 
   const handleRecordNoteEnd = (noteObj) => {
+    // adds endTime and duration to recorded notes
     const newNotes = songNotes.map(note => {
       if (note.pitch === noteObj.pitch && !note.endTime){
         note.endTime = noteObj.endTime
@@ -109,6 +114,7 @@ const Instrument = (props) => {
         return note
       }
     })
+    // save the updated notes array into state
     setSongNotes(newNotes)
   }
 
@@ -117,48 +123,63 @@ const Instrument = (props) => {
   }
 
   const handleClear = () => {
+    // clear recorded notes in both state and store
     dispatch({ type: clearRecordedNotes.type })
     setSongNotes([])
   }
 
   const handleDuet = () => {
     if (songNotes.length){
-      let copy = [...songNotes ]
-      const notesToSequence = []
-      copy.map(note => {
+      // begin configuration for magenta from recorded notes in state
+      const notesToSequence = songNotes.map(note => {
         let newNote = {pitch: note.pitch}
-        let newTime = Math.round((note.time * 4) / 4).toFixed(2) 
+        // converts note start time to 'steps' which are what magenta expects
+        let newTime = Math.round((note.time * 4) / 4).toFixed(2)
         newNote.time = Math.round((newTime / 1000) * 4)
+        
+        // same as above, but for note end times
         let newEndTime = Math.round((note.endTime * 4) / 4).toFixed(2)
         newNote.endTime = Math.round((newEndTime / 1000) * 4)
-        notesToSequence.push(newNote)
-        return notesToSequence
+
+        return newNote
       })
 
+      // quantize the n for magenta, using their functions
       let last = notesToSequence.length - 1
       const quantizeRecording = mm.sequences.quantizeNoteSequence(notesToSequence, 4)
       quantizeRecording.notes = notesToSequence
       quantizeRecording.totalQuantizedSteps = notesToSequence[last].endTime
-      console.log(quantizeRecording)
+
+      // send the quantized sequence to the neural network
       playDuet(quantizeRecording)
     } else {
       swal("You have to record a melody before activating duet mode")
     }
   }
 
-  const playDuet = (sequence) => {
+  const playDuet = async (sequence) => {
     if (rnnPlayer.isPlaying()) {
       return rnnPlayer.stop()
     } else {
+      // to do: allow user to change these?
+      
+      // rnnSteps controls length of the response: 128 steps is roughly 15 seconds
       let rnnSteps = 128;
+      
+      // rnnTemp controls how random the response is: usually between 0-2. 
+      // higher value means more random
       let rnnTemp = 1;
 
-      melodyRNN
-      .continueSequence(sequence, rnnSteps, rnnTemp)
-      .then((sample => {
-        rnnPlayer.start(sample)
-      }))
+      dispatch({ type: toggleIsLoading.type, payload: true })
+      const sample = await melodyRNN.continueSequence(sequence, rnnSteps, rnnTemp)
+        
+      dispatch({ type: toggleIsLoading.type, payload: false })
+      rnnPlayer.start(sample)
     }
+  }
+
+  const clearLoaded = () => {
+    dispatch({ type: clearLoadedSongs.type })
   }
 
   const keyboardShortcuts = KeyboardShortcuts.create({
@@ -166,16 +187,14 @@ const Instrument = (props) => {
     lastNote: song.config.noteRange.last + song.config.keyboardShortcutOffset,
     keyboardConfig: KeyboardShortcuts.HOME_ROW,
   });
-  const loaded = props.loadedSongs.length 
+
+  const loaded = song.loadedSongs.length 
 
   return (
     <SoundfontProvider
       pausePlaying={pausePlaying}
-      handleInstrumentChange={props.handleInstrumentChange}
       handleRecordNoteStart={handleRecordNoteStart}
       handleRecordNoteEnd={handleRecordNoteEnd}
-      audioContext={props.audioContext}
-      hostname={props.soundfontHostname}
       render={({ isLoading, playNote, stopNote, stopAllNotes }) => (
         <div>
             <div className="text-center">
@@ -188,7 +207,7 @@ const Instrument = (props) => {
             <button className="instrument-btn" onClick={handleClear}>Clear</button>
             <button className="instrument-btn" onClick={handleDuet}>Duet</button>
             <button className="instrument-btn" onClick={handleSave}>Save</button>
-            <button className="instrument-btn" onClick={loaded ? props.handleClearLoadedSongs : props.handleLoading}>{loaded ? "Clear Loaded" : "Load"}</button>
+            <button className="instrument-btn" onClick={loaded ? clearLoaded : props.handleLoading}>{loaded ? "Clear Loaded" : "Load"}</button>
           </div>
           <div className="mt-4">
             <DimensionsProvider>

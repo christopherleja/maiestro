@@ -2,20 +2,23 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import 'react-piano/dist/styles.css';
 import Instrument from './Instrument';
-import SongBtn from './SongBtn'
+import SongBtn from '../SongBtn'
 import swal from 'sweetalert';
 
-import { loadSong, loadAllSongs, clearLoadedSongs, changeTitle, changeInstrument } from '../store/songReducer'
+import { 
+  changeTitle, 
+  loadSong, 
+  loadAllSongs, 
+} from '../../store/songReducer'
 
 
 // webkitAudioContext fallback needed to support Safari
 // To do: export these to ENV variable file?
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
 const InstrumentContainer = () => {
   const { song, user } = useSelector(state => state)
-  // const user = useSelector(state => state.user)
+  const { soundfontHostname } = useSelector(state => state.song.constants )
   const dispatch = useDispatch()
 
   const handleSongLoad = (songObj) => {
@@ -51,23 +54,21 @@ const InstrumentContainer = () => {
   }
 
   const renderLoadedSongs = () => {
-    if (user.currentUser && song.loadedSongs.length){
-      return song.loadedSongs.map(song => {
+    const { loadedSongs } = song
+    const { currentUser, url } = user
+    if (currentUser && loadedSongs.length){
+      return loadedSongs.map(song => {
         return (
           <SongBtn key={song.id} 
             song={song} 
             toggleDisplayedButtons={toggleDisplayedButtons} 
-            url={user.url} 
-            currentUser={user.currentUser} 
+            url={url} 
+            currentUser={currentUser} 
             handleSongLoad={handleSongLoad}
           />
         )
       }
     )}
-  }
-
-  const handleClearLoadedSongs = () => {
-    dispatch({ type: clearLoadedSongs.type, payload: [] })
   }
 
   const toggleDisplayedButtons = (id) => {
@@ -76,10 +77,6 @@ const InstrumentContainer = () => {
     })
       dispatch({ type: loadAllSongs.type, payload: updatedLoadedSongs })
     return;
-  }
-
-  const handleInstrumentChange = (instrument) => {
-    dispatch({ type: changeInstrument.type, payload: instrument.name })
   }
 
   const handleTitle = (event) => {
@@ -106,10 +103,8 @@ const InstrumentContainer = () => {
       <Instrument 
         soundfontHostname={soundfontHostname} 
         audioContext={audioContext} 
-        handleInstrumentChange={handleInstrumentChange} 
-        loadedSongs={song.loadedSongs} 
         handleLoading={handleLoading} 
-        handleClearLoadedSongs={handleClearLoadedSongs}
+        // handleClearLoadedSongs={handleClearLoadedSongs}
       />
       </div>
       <div className="mt-5">

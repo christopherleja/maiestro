@@ -2,23 +2,14 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import Soundfont from 'soundfont-player';
 
-import { stopPlaying } from '../store/songReducer'
+import { audioContext, changeInstrument, stopPlaying } from '../store/songReducer'
 
-const SoundfontProvider = (props) => {
-
-  const { 
-    handleInstrumentChange, 
-    handleRecordNoteStart, 
-    handleRecordNoteEnd,
-    audioContext,
-    hostname,
-  } = props
-  // To do: Refactor these into a separate environmental variables file
-  const format = 'mp3';
-  const soundfont = 'MusyngKite';
+const SoundfontProvider = ({ handleRecordNoteStart, 
+  handleRecordNoteEnd, render }) => {
 
   // general access to the song reducer
   const song = useSelector(state => state.song)
+  const { soundfontHostname, soundfont, format } = useSelector(state => state.song.constants)
   // used often enough it was worth getting uniquely
   const instrumentName = useSelector(state => state.song.config.instrumentName)
   const dispatch = useDispatch();
@@ -28,7 +19,7 @@ const SoundfontProvider = (props) => {
   // fortunately, I only use it in this component anyway.
   const [ activeAudioNodes, setActiveAudioNodes ] = useState({})
 
-  // to do: refactor this into redux
+  // to do: refactor this into redux?
   const [ instrument, setInstrument ] = useState(null)
 
   const loadInstrument = () => {
@@ -38,10 +29,10 @@ const SoundfontProvider = (props) => {
         format,
         soundfont,
         nameToUrl: (name, soundfont, format) => {
-            return `${hostname}/${soundfont}/${name}-${format}.js`;
+            return `${soundfontHostname}/${soundfont}/${name}-${format}.js`;
         },
         }).then(instrument => {
-        handleInstrumentChange(instrument)
+          dispatch({ type: changeInstrument.type, payload: instrument.name })
         setInstrument(instrument)
       })
     }
@@ -141,7 +132,7 @@ const SoundfontProvider = (props) => {
   }
   }, [song.playing])
 
-    return props.render({
+    return render({
       isLoading: !instrument,
       playNote: playNote,
       stopNote: stopNote,
