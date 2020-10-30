@@ -7,7 +7,7 @@ const SignUpForm = props => {
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ password_confirmation, setPassword_confirmation ] = useState('');
-  
+
   const url = useSelector(state => state.user.url)
   const dispatch = useDispatch()
   

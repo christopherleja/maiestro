@@ -33,9 +33,11 @@ const LoginForm = props => {
         }
       })
       .then(user => {
-        dispatch({type: login.type, payload: user})
-        props.history.push("/")
-      })
+        if (user){
+          dispatch({type: login.type, payload: user})
+          props.history.push("/")
+        }
+        })
       .catch(err => {
         swal("Invalid username or password. Please try again.")
       })

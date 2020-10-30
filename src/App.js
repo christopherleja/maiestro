@@ -11,6 +11,7 @@ import Navbar from './components/user/Navbar'
 import Spinner from 'react-spinkit';
 
 import { login } from './store/userReducer';
+import { result } from 'lodash';
 
 function App() {
   const URL = useSelector(state => state.user.url)
@@ -24,7 +25,7 @@ function App() {
     })
     .then(r => r.json())
     .then(res => {
-      if (res){
+      if (res.username){
         dispatch({ type: login.type, payload: res })
       } else {
         return null;
