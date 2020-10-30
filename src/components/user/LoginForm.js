@@ -5,7 +5,7 @@ import swal from 'sweetalert';
 import { login } from '../../store/userReducer'
 
 
-const LoginForm = (props) => {
+const LoginForm = props => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -33,7 +33,6 @@ const LoginForm = (props) => {
         }
       })
       .then(user => {
-        console.log(user)
         dispatch({type: login.type, payload: user})
         props.history.push("/")
       })

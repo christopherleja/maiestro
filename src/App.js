@@ -12,7 +12,6 @@ import Spinner from 'react-spinkit';
 
 import { login } from './store/userReducer';
 
-
 function App() {
   const URL = useSelector(state => state.user.url)
   const isLoading = useSelector(state => state.song.isLoading )
@@ -45,11 +44,10 @@ function App() {
     <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} />} />
     { isLoading && 
     <div className="loading-icon-container">
-      <Spinner name="ball-clip-rotate" 
+      <Spinner name="ball-spin-fade-loader" 
         className="loading-icon" color="purple"
         /> 
-    </div>
-        }
+    </div>}
     <Particles />
     </>
   );

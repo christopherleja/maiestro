@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
-import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
+import { Piano, KeyboardShortcuts } from 'react-piano';
 import * as mm from '@magenta/music'
-import DimensionsProvider from '../DimensionsProvider';
-import InstrumentListProvider from '../InstrumentListProvider';
-import SoundfontProvider from '../SoundfontProvider';
-import PianoConfig from '../PianoConfig';
+import DimensionsProvider from './DimensionsProvider';
+import InstrumentListProvider from './InstrumentListProvider';
+import SoundfontProvider from './SoundfontProvider';
+import PianoConfig from './PianoConfig';
 import swal from 'sweetalert';
 
 import { 
@@ -35,6 +35,10 @@ const Instrument = (props) => {
   const melodyRNN = new mm.MusicRNN(magentaCheckpoint) 
   // rnnPlayer will play the sequence maiestro gets back from melodyRNN
   const rnnPlayer = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus')
+
+  useEffect(() => {
+    melodyRNN.initialize()
+  }, [])
 
   // to do: separate fetches to separate file/maybe use axios? Make this less ugly
   const handleSave = () => {

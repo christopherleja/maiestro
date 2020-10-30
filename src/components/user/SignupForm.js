@@ -1,28 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import swal from 'sweetalert';
+import { login } from '../../store/userReducer'
 
-class SignUpForm extends React.Component {
-  state = {
-    username: "",
-    password: "",
-    password_confirmation: ""
+const SignUpForm = props => {
+  const [ username, setUsername ] = useState('');
+  const [ password, setPassword ] = useState('');
+  const [ password_confirmation, setPassword_confirmation ] = useState('');
+  
+  const url = useSelector(state => state.user.url)
+  const dispatch = useDispatch()
+  
+  const handleUsername = e => {
+    setUsername(e.target.value)
   }
 
-  handleInputChange = event => {
-    this.setState({
-      [event.target.name]: event.target.value
-    })
+  const handlePassword = e => {
+    setPassword(e.target.value)
+  }
+  
+  const handlePassword_confirmation = e => {
+    setPassword_confirmation(e.target.value)
   }
 
-  handleSubmit = event => {
+  const handleSubmit = event => {
     event.preventDefault()
-    if (this.state.password === this.state.password_confirmation && this.state.password.length >= 6){
-      fetch(this.props.url + "/signup", {
+    if (password === password_confirmation && password.length >= 6){
+      const newUser = {
+        username,
+        password,
+        password_confirmation
+      }
+      fetch(url + "/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(this.state)
+        body: JSON.stringify(newUser)
       })
       .then(r => {
         if (r.ok){
@@ -32,36 +46,48 @@ class SignUpForm extends React.Component {
         }
       })   
       .then(user => {
-        this.props.updateCurrentUser(user)
-        this.props.history.push("/")
+        dispatch({ type: login.type, payload: user })
+        props.history.push("/")
       })
       .catch(err => {
         swal("Looks like that username is already taken. Please try another")
       })
-    } else if (this.state.password === this.state.password_confirmation && this.state.password.length < 6) {
+    } else if (password === password_confirmation && password.length < 6) {
       swal("Password must be at least 6 characters")
     } else {
       swal("Passwords don't match")
     } 
   }
 
-  render() {
-    const { username, password, password_confirmation } = this.state
-    return (
-      <div className="form-container">
-        <h3>Sign up for an account</h3>
-        <form onSubmit={this.handleSubmit}>
-          <label>Username:</label>
-          <input className="form" type="text" name="username" onChange={this.handleInputChange} value={username} />
-          <label>Password:</label>
-          <input className="form" type="password" name="password" onChange={this.handleInputChange} value={password} />
-          <label>Confirm Password:</label>
-          <input className="form" type="password" name="password_confirmation" onChange={this.handleInputChange} value={password_confirmation} />
-          <input className="btn" type="submit" value="Sign Up" />
-        </form>
-      </div>
-    )
-  }
+  return (
+    <div className="form-container">
+      <h3>Sign up for an account</h3>
+      <form onSubmit={handleSubmit}>
+        
+        <label>Username:</label>
+        <input className="form" 
+          type="text" 
+          name="username" 
+          onChange={handleUsername} 
+        />
+        
+        <label>Password:</label>
+        <input className="form" 
+          type="password" 
+          name="password" 
+          onChange={handlePassword} 
+        />
+        
+        <label>Confirm Password:</label>
+        <input className="form" 
+          type="password" name="password_confirmation" 
+          onChange={handlePassword_confirmation} 
+        />
+        <input className="btn" type="submit" value="Sign Up" />
+      </form>
+    </div>
+  )
 }
+
 
 export default SignUpForm

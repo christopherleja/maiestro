@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import Soundfont from 'soundfont-player';
 
-import { audioContext, changeInstrument, stopPlaying } from '../store/songReducer'
+import { audioContext, changeInstrument, stopPlaying } from '../../store/songReducer'
 
 const SoundfontProvider = ({ handleRecordNoteStart, 
   handleRecordNoteEnd, render }) => {

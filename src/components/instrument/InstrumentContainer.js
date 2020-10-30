@@ -2,23 +2,13 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import 'react-piano/dist/styles.css';
 import Instrument from './Instrument';
-import SongBtn from '../SongBtn'
+import SongBtn from './SongBtn'
 import swal from 'sweetalert';
 
-import { 
-  changeTitle, 
-  loadSong, 
-  loadAllSongs, 
-} from '../../store/songReducer'
-
-
-// webkitAudioContext fallback needed to support Safari
-// To do: export these to ENV variable file?
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+import { changeTitle, loadAllSongs, loadSong, } from '../../store/songReducer'
 
 const InstrumentContainer = () => {
   const { song, user } = useSelector(state => state)
-  const { soundfontHostname } = useSelector(state => state.song.constants )
   const dispatch = useDispatch()
 
   const handleSongLoad = (songObj) => {
@@ -72,11 +62,10 @@ const InstrumentContainer = () => {
   }
 
   const toggleDisplayedButtons = (id) => {
-    let updatedLoadedSongs = song.loadedSongs.filter(song => {
+    const updatedLoadedSongs = song.loadedSongs.filter(song => {
       if (song.id !== id) return song
     })
-      dispatch({ type: loadAllSongs.type, payload: updatedLoadedSongs })
-    return;
+      return dispatch({ type: loadAllSongs.type, payload: updatedLoadedSongs })
   }
 
   const handleTitle = (event) => {
@@ -100,12 +89,7 @@ const InstrumentContainer = () => {
         </small>
       </div>
       
-      <Instrument 
-        soundfontHostname={soundfontHostname} 
-        audioContext={audioContext} 
-        handleLoading={handleLoading} 
-        // handleClearLoadedSongs={handleClearLoadedSongs}
-      />
+      <Instrument handleLoading={handleLoading} />
       </div>
       <div className="mt-5">
       </div>

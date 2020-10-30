@@ -28,6 +28,7 @@ const initialState = {
     }
 }
 
+// webkitAudioContext fallback needed to support Safari
 export const audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
 const song = createSlice({
