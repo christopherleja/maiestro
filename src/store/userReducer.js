@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   currentUser: null,
-  url: "https://maiestro-backend.herokuapp.com"
 };
 
 const user = createSlice({

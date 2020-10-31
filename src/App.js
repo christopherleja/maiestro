@@ -24,7 +24,7 @@ function App() {
     })
     .then(r => r.json())
     .then(res => {
-      if (res){
+      if (res.username){
         dispatch({ type: login.type, payload: res })
       } else {
         return null;

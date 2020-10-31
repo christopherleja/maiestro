@@ -20,9 +20,12 @@ import {
   updateConfig 
 } from '../../store/songReducer'
 
+import config from '../../constants'
+
 
 const Instrument = (props) => {
-  const { song, user: { currentUser, url }} = useSelector(state => state)
+  const { song, user: { currentUser }} = useSelector(state => state)
+  const url = config.url
   const dispatch = useDispatch()
   
   // initially stores recorded notes that will get sent to store when completed
@@ -52,7 +55,7 @@ const Instrument = (props) => {
         instrument: song.config.instrumentName,
         notes: song.recordedNotes.notes
       }
-
+      console.log(melody)
       fetch(url + `/users/${currentUser.id}/songs`, {
         method: 'POST',
         headers: {
@@ -63,6 +66,7 @@ const Instrument = (props) => {
         })
         .then(r => r.json())
         .then(res => {
+          console.log(res)
           swal(`${res.title} was saved successfully`);
         })
         .catch((err) => {

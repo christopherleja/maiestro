@@ -14,22 +14,13 @@ const initialState = {
       },
       keyboardShortcutOffset: 0,
     },
-    activeAudioNodes: {},
     playing: false,
     time: 0,
     recording: false,
     loadedSongs: [],
     title: "",
     isLoading: false,
-    constants: {
-      soundfontHostname: 'https://d1pzp51pvbm36p.cloudfront.net',
-      format: 'mp3',
-      soundfont: 'MusyngKite',
-    }
 }
-
-// webkitAudioContext fallback needed to support Safari
-export const audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
 const song = createSlice({
   name: "song",

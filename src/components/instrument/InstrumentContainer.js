@@ -5,10 +5,15 @@ import Instrument from './Instrument';
 import SongBtn from './SongBtn'
 import swal from 'sweetalert';
 
+import config from '../../constants'
+
 import { changeTitle, loadAllSongs, loadSong, } from '../../store/songReducer'
 
 const InstrumentContainer = () => {
-  const { song, user } = useSelector(state => state)
+  const { song } = useSelector(state => state)
+  const currentUser = useSelector(state => state.user.currentUser)
+  const url = config.url
+
   const dispatch = useDispatch()
 
   const handleSongLoad = (songObj) => {
@@ -25,7 +30,6 @@ const InstrumentContainer = () => {
   }
 
     const handleLoading = () => {
-      const { currentUser, url } = user
       if (currentUser){
         fetch(url + `/users/${currentUser.id}/songs`, {
           credentials: "include"
@@ -45,7 +49,6 @@ const InstrumentContainer = () => {
 
   const renderLoadedSongs = () => {
     const { loadedSongs } = song
-    const { currentUser, url } = user
     if (currentUser && loadedSongs.length){
       return loadedSongs.map(song => {
         return (

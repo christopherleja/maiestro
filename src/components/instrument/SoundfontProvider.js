@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import Soundfont from 'soundfont-player';
+import config from '../../constants';
 
-import { audioContext, changeInstrument, stopPlaying } from '../../store/songReducer'
+import { changeInstrument, stopPlaying } from '../../store/songReducer'
 
 const SoundfontProvider = ({ handleRecordNoteStart, 
   handleRecordNoteEnd, render }) => {
 
   // general access to the song reducer
   const song = useSelector(state => state.song)
-  const { soundfontHostname, soundfont, format } = useSelector(state => state.song.constants)
+  const { soundfontHostname, soundfont, format, audioContext } = config
   // used often enough it was worth getting uniquely
   const instrumentName = useSelector(state => state.song.config.instrumentName)
   const dispatch = useDispatch();
