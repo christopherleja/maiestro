@@ -3,10 +3,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { logout } from '../../store/userReducer'
 import { clearLoadedSongs, clearRecordedNotes } from '../../store/songReducer'
+import config from '../../constants'
 
 const NavBar = () => {
 
-  const {currentUser, url} = useSelector(state => state.user);
+  const currentUser = useSelector(state => state.user.currentUser);
+  const url = config.url
   const dispatch = useDispatch();
 
   const handleLogout = () => {

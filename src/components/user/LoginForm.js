@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import swal from 'sweetalert';
 
 import { login } from '../../store/userReducer'
+import config from '../../constants'
 
 
 const LoginForm = props => {
@@ -10,7 +11,7 @@ const LoginForm = props => {
   const [password, setPassword] = useState('')
 
   const dispatch = useDispatch()
-  const url = useSelector(state => state.user.url)
+  const url = config.url
 
   const handleSubmit = event => {
     event.preventDefault()

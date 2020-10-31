@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import config from '../../constants';
 
 const InstrumentListProvider = ({  render }) => {
   const [ instrumentList, setInstrumentList ] = useState()
-  const { soundfontHostname, soundfont} = useSelector(state => state.song.constants)
+  const { soundfontHostname, soundfont } = config
 
   useEffect(() => {
     loadInstrumentList()

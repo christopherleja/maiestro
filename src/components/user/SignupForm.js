@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import swal from 'sweetalert';
 import { login } from '../../store/userReducer'
+import config from '../../constants'
 
 const SignUpForm = props => {
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ password_confirmation, setPassword_confirmation ] = useState('');
-
-  const url = useSelector(state => state.user.url)
+  
+  const url = config.url
   const dispatch = useDispatch()
   
   const handleUsername = e => {
@@ -50,6 +51,7 @@ const SignUpForm = props => {
         props.history.push("/")
       })
       .catch(err => {
+        // console.error(err)
         swal("Looks like that username is already taken. Please try another")
       })
     } else if (password === password_confirmation && password.length < 6) {
