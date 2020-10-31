@@ -27,7 +27,6 @@ const Instrument = (props) => {
   const { song, user: { currentUser }} = useSelector(state => state)
   const { url, melodyRNN, rnnPlayer } = config
   const dispatch = useDispatch()
-  // const [ cached, setCached ] = useState()
   
   // initially stores recorded notes that will get sent to store when completed
   const [ songNotes, setSongNotes ] = useState([])
@@ -91,7 +90,7 @@ const Instrument = (props) => {
         type: addRecordedNotes.type, 
         payload: {
           notes: songNotes,
-          totalTime: totalTime
+          totalTime
         }
       })
     }

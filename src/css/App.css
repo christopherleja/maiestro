@@ -51,9 +51,12 @@
 
   .container {
     position: absolute;
+    /* display: flex; */
     bottom: 0.25rem;
     width: 100%;
     right: 0;
+    left: 0;
+    /* border: solid #111 1rem; */
   }
 
   .title-card-container {
@@ -83,7 +86,7 @@
     background-color: rgb(17, 17, 17);
     color: rgb(18, 193, 47);
     border: rgb(18, 193, 47);
-    font-size: 0.9rem;
+    font-size: 1rem;
     border-style: solid;
     position: relative;
   }

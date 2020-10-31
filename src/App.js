@@ -11,16 +11,16 @@ import Navbar from './components/user/Navbar'
 import Spinner from 'react-spinkit';
 
 import { login } from './store/userReducer';
-import { result } from 'lodash';
+import config from './constants';
 
 function App() {
-  const URL = useSelector(state => state.user.url)
+  const url = config.url
   const isLoading = useSelector(state => state.song.isLoading )
 
   const dispatch = useDispatch()
 
   const autoLogin = () => {
-    fetch(URL + '/autologin', {
+    fetch(url + '/autologin', {
       credentials: 'include'
     })
     .then(r => r.json())

@@ -84,7 +84,7 @@ const InstrumentContainer = () => {
           onChange={handleTitle} 
           value={song.title}
           placeholder="Untitled"
-        />
+          />
 
         <small className="instructions title-card">
           Use the mouse or keyboard to play. 
@@ -95,7 +95,7 @@ const InstrumentContainer = () => {
       <Instrument handleLoading={handleLoading} />
       </div>
       <div className="mt-5">
-      </div>
+        </div>
       <div className="song-btn-container">
         {songBtns}
       </div>
