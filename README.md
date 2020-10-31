@@ -5,7 +5,7 @@ Maiestro is a music app designed to help users kickstart their creativity and av
 - Uses magenta.js (https://github.com/magenta/magenta-js) and machine learning to continue user's recorded melody upon pressing the duet button. 
 - Uses a session-based Rails API structure for authentication and authorization.
 
-Front end was built using React, back end with a Rails API. Back end code: https://github.com/christopherleja/maiestro-backend
+Front end was built using React and Redux, back end with a Rails API and a PostgreSQL database. Back end code: https://github.com/christopherleja/maiestro-backend
 
 How to use:
 
