@@ -25,19 +25,12 @@ import config from '../../constants'
 
 const Instrument = (props) => {
   const { song, user: { currentUser }} = useSelector(state => state)
-  const url = config.url
+  const { url, melodyRNN, rnnPlayer } = config
   const dispatch = useDispatch()
+  // const [ cached, setCached ] = useState()
   
   // initially stores recorded notes that will get sent to store when completed
   const [ songNotes, setSongNotes ] = useState([])
-
-  // to do: export to ENV variables file
-  // magentaCheckpoint is the api checkpoint maiestro connects to
-  const magentaCheckpoint = "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/melody_rnn"
-  // melodyRNN will handle interactions with the neural network
-  const melodyRNN = new mm.MusicRNN(magentaCheckpoint) 
-  // rnnPlayer will play the sequence maiestro gets back from melodyRNN
-  const rnnPlayer = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus')
 
   useEffect(() => {
     melodyRNN.initialize()
@@ -55,7 +48,6 @@ const Instrument = (props) => {
         instrument: song.config.instrumentName,
         notes: song.recordedNotes.notes
       }
-      console.log(melody)
       fetch(url + `/users/${currentUser.id}/songs`, {
         method: 'POST',
         headers: {
@@ -66,7 +58,6 @@ const Instrument = (props) => {
         })
         .then(r => r.json())
         .then(res => {
-          console.log(res)
           swal(`${res.title} was saved successfully`);
         })
         .catch((err) => {
@@ -170,7 +161,6 @@ const Instrument = (props) => {
       return rnnPlayer.stop()
     } else {
       // to do: allow user to change these?
-      
       // rnnSteps controls length of the response: 128 steps is roughly 15 seconds
       let rnnSteps = 128;
       
@@ -180,7 +170,7 @@ const Instrument = (props) => {
 
       dispatch({ type: toggleIsLoading.type, payload: true })
       const sample = await melodyRNN.continueSequence(sequence, rnnSteps, rnnTemp)
-        
+      
       dispatch({ type: toggleIsLoading.type, payload: false })
       rnnPlayer.start(sample)
     }

@@ -51,7 +51,6 @@ const SignUpForm = props => {
         props.history.push("/")
       })
       .catch(err => {
-        // console.error(err)
         swal("Looks like that username is already taken. Please try another")
       })
     } else if (password === password_confirmation && password.length < 6) {
