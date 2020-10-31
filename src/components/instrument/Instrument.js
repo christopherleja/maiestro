@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { Piano, KeyboardShortcuts } from 'react-piano';
 import * as mm from '@magenta/music'
@@ -9,7 +9,6 @@ import PianoConfig from './PianoConfig';
 import swal from 'sweetalert';
 
 import { 
-  addRecordedNotes, 
   clearLoadedSongs, 
   clearRecordedNotes, 
   startPlaying, 
@@ -17,7 +16,7 @@ import {
   stopPlaying, 
   stopRecording,
   toggleIsLoading,
-  updateConfig 
+  updateConfig,
 } from '../../store/songReducer'
 
 import config from '../../constants'
@@ -27,9 +26,6 @@ const Instrument = (props) => {
   const { song, user: { currentUser }} = useSelector(state => state)
   const { url, melodyRNN, rnnPlayer } = config
   const dispatch = useDispatch()
-  
-  // initially stores recorded notes that will get sent to store when completed
-  const [ songNotes, setSongNotes ] = useState([])
 
   useEffect(() => {
     melodyRNN.initialize()
@@ -70,73 +66,29 @@ const Instrument = (props) => {
   }
 
   const handlePlay = () => {
-    if (!song.recordedNotes.totalTime){
+    if (!song.recordedNotes.totalTime) {
       return swal("There's nothing to play yet. Try recording something first.")
     }
-    if (!song.playing){
-      dispatch({ type: startPlaying.type })
-    } else if (song.playing) {
-      dispatch({ type: stopPlaying.type })
-    } 
+    dispatch({ type: !song.isPlaying ? startPlaying.type : stopPlaying.type })
   } 
 
   const handleRecording = () => {
-    if (!song.recording) dispatch({ type: startRecording.type });
-    else {
-      let last = songNotes.length - 1
-      let totalTime = songNotes[last].endTime
-      dispatch({ type: stopRecording.type })    
-      dispatch({ 
-        type: addRecordedNotes.type, 
-        payload: {
-          notes: songNotes,
-          totalTime
-        }
-      })
-    }
+    dispatch({ type: !song.recording ? startRecording.type : stopRecording.type })
   }
 
-  const handleRecordNoteStart = (note) => {
-    // adds new note with start time
-    setSongNotes([ ...songNotes, note])
-  }
-
-  const handleRecordNoteEnd = (noteObj) => {
-    // adds endTime and duration to recorded notes
-    const newNotes = songNotes.map(note => {
-      if (note.pitch === noteObj.pitch && !note.endTime){
-        note.endTime = noteObj.endTime
-        note.duration = note.endTime - note.start;
-        return note
-      } else {
-        return note
-      }
-    })
-    // save the updated notes array into state
-    setSongNotes(newNotes)
-  }
-
-  const pausePlaying = () => {
-    dispatch({ type: stopPlaying.type })
-  }
-
-  const handleClear = () => {
-    // clear recorded notes in both state and store
-    dispatch({ type: clearRecordedNotes.type })
-    setSongNotes([])
-  }
+  const handleClear = () => dispatch({ type: clearRecordedNotes.type })
 
   const handleDuet = () => {
-    if (songNotes.length){
+    if (song.recordedNotes.notes.length){
       // begin configuration for magenta from recorded notes in state
-      const notesToSequence = songNotes.map(note => {
-        let newNote = {pitch: note.pitch}
+      const notesToSequence = song.recordedNotes.notes.map(note => {
+        const newNote = {pitch: note.pitch}
         // converts note start time to 'steps' which are what magenta expects
-        let newTime = Math.round((note.time * 4) / 4).toFixed(2)
+        const newTime = Math.round((note.time * 4) / 4).toFixed(2)
         newNote.time = Math.round((newTime / 1000) * 4)
         
         // same as above, but for note end times
-        let newEndTime = Math.round((note.endTime * 4) / 4).toFixed(2)
+        const newEndTime = Math.round((note.endTime * 4) / 4).toFixed(2)
         newNote.endTime = Math.round((newEndTime / 1000) * 4)
 
         return newNote
@@ -175,9 +127,7 @@ const Instrument = (props) => {
     }
   }
 
-  const clearLoaded = () => {
-    dispatch({ type: clearLoadedSongs.type })
-  }
+  const clearLoaded = () => dispatch({ type: clearLoadedSongs.type })
 
   const keyboardShortcuts = KeyboardShortcuts.create({
     firstNote: song.config.noteRange.first + song.config.keyboardShortcutOffset,
@@ -189,9 +139,6 @@ const Instrument = (props) => {
 
   return (
     <SoundfontProvider
-      pausePlaying={pausePlaying}
-      handleRecordNoteStart={handleRecordNoteStart}
-      handleRecordNoteEnd={handleRecordNoteEnd}
       render={({ isLoading, playNote, stopNote, stopAllNotes }) => (
         <div>
             <div className="text-center">
