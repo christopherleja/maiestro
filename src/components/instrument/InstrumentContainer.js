@@ -68,7 +68,7 @@ const InstrumentContainer = () => {
     const updatedLoadedSongs = song.loadedSongs.filter(song => {
       if (song.id !== id) return song
     })
-      return dispatch({ type: loadAllSongs.type, payload: updatedLoadedSongs })
+      dispatch({ type: loadAllSongs.type, payload: updatedLoadedSongs })
   }
 
   const handleTitle = (event) => {

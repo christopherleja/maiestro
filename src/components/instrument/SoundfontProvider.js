@@ -3,10 +3,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import Soundfont from 'soundfont-player';
 import config from '../../constants';
 
-import { changeInstrument, stopPlaying } from '../../store/songReducer'
+import { changeInstrument, stopPlaying, addNoteStart, updateRecordedNotes } from '../../store/songReducer'
 
-const SoundfontProvider = ({ handleRecordNoteStart, 
-  handleRecordNoteEnd, render }) => {
+const SoundfontProvider = ({ render }) => {
 
   // general access to the song reducer
   const song = useSelector(state => state.song)
@@ -57,8 +56,9 @@ const SoundfontProvider = ({ handleRecordNoteStart,
       
       if (song.recording){
         // if recording, save note for posterity
-        const note = { pitch: midiNumber, time: start }
-        handleRecordNoteStart(note)
+        const note = { pitch: midiNumber, time: start, endTime: null, duration: null }
+        dispatch({ type: addNoteStart, payload: note})
+        // handleRecordNoteStart(note)
       } 
   };
 
@@ -79,7 +79,7 @@ const SoundfontProvider = ({ handleRecordNoteStart,
         const endTime = Date.now() - song.time
         const note = { pitch: midiNumber, endTime }
 
-        handleRecordNoteEnd(note)
+        dispatch({ type: updateRecordedNotes, payload: note })
       } 
   };
 
@@ -120,6 +120,7 @@ const SoundfontProvider = ({ handleRecordNoteStart,
         setTimeout(() => {
           setActiveAudioNodes({})
         }, totalTime)
+        return null;
       }) 
     }
   }
