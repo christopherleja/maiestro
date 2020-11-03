@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import 'react-piano/dist/styles.css';
 import Instrument from './Instrument';
 import SongBtn from './SongBtn'
-import swal from 'sweetalert';
 
 import config from '../../constants'
 
@@ -28,25 +27,6 @@ const InstrumentContainer = () => {
       title: songObj.title
       }
     })
-  }
-
-  // Maybe move this into instrument? Avoid passing it as a prop?
-    const handleLoading = () => {
-      if (currentUser){
-        fetch(url + `/users/${currentUser.id}/songs`, {
-          credentials: "include"
-        })
-        .then(r => r.json())
-        .then(songs => {
-          dispatch({ type: loadAllSongs.type, payload: songs })
-      }, () => {
-        if (song.loadedSongs.length === 0){
-          swal("It doesn't look like you've saved any songs yet")
-        }
-      });
-    } else {
-      swal("Please sign in to save or load songs")
-    }
   }
 
   const renderLoadedSongs = () => {
@@ -101,7 +81,7 @@ const InstrumentContainer = () => {
           </small>
         </div>
         
-        <Instrument handleLoading={handleLoading} />
+        <Instrument />
         </div>
       </div>
     </>

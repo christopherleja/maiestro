@@ -11,6 +11,7 @@ import swal from 'sweetalert';
 import { 
   clearLoadedSongs, 
   clearRecordedNotes, 
+  loadAllSongs,
   startPlaying, 
   startRecording, 
   stopPlaying, 
@@ -64,6 +65,24 @@ const Instrument = (props) => {
         swal("Please sign in to save or load songs")
       }
   }
+
+  const handleLoading = () => {
+    if (currentUser){
+      fetch(url + `/users/${currentUser.id}/songs`, {
+        credentials: "include"
+      })
+      .then(r => r.json())
+      .then(songs => {
+        dispatch({ type: loadAllSongs.type, payload: songs })
+    }, () => {
+      if (song.loadedSongs.length === 0){
+        swal("It doesn't look like you've saved any songs yet")
+      }
+    });
+  } else {
+    swal("Please sign in to save or load songs")
+  }
+}
 
   const handlePlay = () => {
     if (!song.recordedNotes.totalTime) {
@@ -146,12 +165,29 @@ const Instrument = (props) => {
             </div>
           </div>
           <div className="btn-container">
-            <button className="instrument-btn" onClick={handlePlay}>{song.playing ? "Stop" : "Play" }</button>
-            <button className="instrument-btn" onClick={handleRecording}>{song.recording ? "Stop" : "Record" }</button>
-            <button className="instrument-btn" onClick={handleClear}>Clear</button>
-            <button className="instrument-btn" onClick={handleDuet}>Duet</button>
-            <button className="instrument-btn" onClick={handleSave}>Save</button>
-            <button className="instrument-btn" onClick={loaded ? clearLoaded : props.handleLoading}>{loaded ? "Clear Loaded" : "Load"}</button>
+            <button className="instrument-btn" 
+              onClick={handlePlay}>
+                {song.playing ? "Stop" : "Play" }
+            </button>
+            <button className="instrument-btn" 
+              onClick={handleRecording}>
+                {song.recording ? "Stop" : "Record" }
+            </button>
+            <button className="instrument-btn" 
+              onClick={handleClear}>
+                Clear
+            </button>
+            <button className="instrument-btn" 
+              onClick={handleDuet}>
+                Duet
+            </button>
+            <button className="instrument-btn" 
+              onClick={handleSave}>
+                Save
+            </button>
+            <button className="instrument-btn" 
+              onClick={loaded ? clearLoaded : handleLoading}>{loaded ? "Clear Loaded" : "Load"}
+            </button>
           </div>
           <div className="mt-4">
             <DimensionsProvider>
