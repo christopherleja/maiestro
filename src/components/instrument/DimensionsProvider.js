@@ -1,4 +1,3 @@
-import { element } from 'prop-types';
 import React from 'react';
 import Dimensions from 'react-dimensions';
 
@@ -15,4 +14,4 @@ class DimensionsProvider extends React.Component {
     }
 }
 
-export default Dimensions(Option.elementResize = true)(DimensionsProvider);
+export default Dimensions()(DimensionsProvider);
