@@ -28,7 +28,7 @@ function App() {
       if (res.username){
         dispatch({ type: login.type, payload: res })
       } else {
-        return null;
+        console.log(res);
       }
     })
   }
@@ -40,6 +40,7 @@ function App() {
   return (
     <>
     <Navbar />
+    <Particles />
     <Route path='/' exact render={() => <InstrumentContainer />} />
     <Route path="/login" render= {routeProps => <LoginForm {...routeProps} />} />
     <Route path="/signup" render= {routeProps => <SignupForm {...routeProps} />} />
@@ -49,7 +50,6 @@ function App() {
         className="loading-icon" color="purple"
         /> 
     </div>}
-    <Particles />
     </>
   );
     

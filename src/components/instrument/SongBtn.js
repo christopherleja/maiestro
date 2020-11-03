@@ -1,4 +1,5 @@
 import React from 'react'
+import swal from 'sweetalert'
 
 const SongBtn = (props) => {
 
@@ -13,7 +14,9 @@ const SongBtn = (props) => {
     .then(res => {
       toggleDisplayedButtons(id)
     })
-    .catch(err => console.error(err))
+    .catch(err => {
+      swal(`Sorry, we couldn't delete ${song.title} at this time. Please try again!`)
+    })
   }
 
   const loadSong = (id) => {

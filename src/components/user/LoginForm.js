@@ -50,6 +50,7 @@ const LoginForm = props => {
       <h3>Sign in to your account</h3>
       <form onSubmit={handleSubmit}>
         <label>Username:</label>
+        <br />
         <input 
           className="form" 
           type="text" 
@@ -57,7 +58,10 @@ const LoginForm = props => {
           onChange={(e) => setUsername(e.target.value)} 
           value={username} 
         />
+
+        <br />
         <label>Password:</label>
+        <br />
         <input 
           className="form" 
           type="password" 
@@ -65,6 +69,7 @@ const LoginForm = props => {
           onChange={(e) => setPassword(e.target.value)} 
           value={password} 
         />
+        <br />
         <input className="btn" type="submit" value="Login" />
       </form>
     </div>

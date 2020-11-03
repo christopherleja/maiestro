@@ -20,6 +20,7 @@ const initialState = {
     loadedSongs: [],
     title: "",
     isLoading: false,
+    loadedIndex: 0,
 }
 
 const song = createSlice({
@@ -82,8 +83,10 @@ const song = createSlice({
 
     updateConfig: (state, action) => { state.config = action.payload },
 
+    updateLoadedIndex: (state, action) => {state.loadedIndex = action.payload},
+
     updateRecordedNotes: (state, action) => {
-      const { pitch, endTime  } = action.payload
+      const { pitch, endTime } = action.payload
 
       state.recordedNotes.notes = state.recordedNotes.notes.map(note => {
         if (note.pitch === pitch && !note.endTime){
@@ -116,6 +119,7 @@ export const {
   stopPlaying,
   toggleIsLoading,
   updateConfig,
+  updateLoadedIndex,
   updateRecordedNotes
 } = song.actions
 export default song.reducer;

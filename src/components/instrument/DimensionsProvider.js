@@ -1,8 +1,9 @@
+import { element } from 'prop-types';
 import React from 'react';
 import Dimensions from 'react-dimensions';
 
 class DimensionsProvider extends React.Component {
-    render() {
+    render(){
         return (
         <div>
             {this.props.children({
@@ -12,6 +13,6 @@ class DimensionsProvider extends React.Component {
         </div>
         );
     }
-    }
+}
 
-export default Dimensions()(DimensionsProvider);
+export default Dimensions(Option.elementResize = true)(DimensionsProvider);

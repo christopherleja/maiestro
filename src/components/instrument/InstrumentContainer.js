@@ -8,9 +8,10 @@ import swal from 'sweetalert';
 import config from '../../constants'
 
 import { changeTitle, loadAllSongs, loadSong, } from '../../store/songReducer'
+import Pager from './Pager';
 
 const InstrumentContainer = () => {
-  const { song } = useSelector(state => state)
+  const song = useSelector(state => state.song)
   const currentUser = useSelector(state => state.user.currentUser)
   const url = config.url
 
@@ -29,6 +30,7 @@ const InstrumentContainer = () => {
     })
   }
 
+  // Maybe move this into instrument? Avoid passing it as a prop?
     const handleLoading = () => {
       if (currentUser){
         fetch(url + `/users/${currentUser.id}/songs`, {
@@ -48,9 +50,10 @@ const InstrumentContainer = () => {
   }
 
   const renderLoadedSongs = () => {
-    const { loadedSongs } = song
-    if (currentUser && loadedSongs.length){
-      return loadedSongs.map(song => {
+    const { loadedSongs, loadedIndex } = song
+    const pagedSongs = loadedSongs.slice(loadedIndex, loadedIndex + 9)
+    if (currentUser && pagedSongs.length){
+      return pagedSongs.map(song => {
         return (
           <SongBtn key={song.id} 
             song={song} 
@@ -78,26 +81,28 @@ const InstrumentContainer = () => {
   const songBtns = renderLoadedSongs()
   return (
     <>
-    <div className="container">
-      <div className="title-card-container">
-        <input className="title title-card" 
-          onChange={handleTitle} 
-          value={song.title}
-          placeholder="Untitled"
-          />
-
-        <small className="instructions title-card">
-          Use the mouse or keyboard to play. 
-          Move shortcuts around by using left and right arrow keys.
-        </small>
-      </div>
-      
-      <Instrument handleLoading={handleLoading} />
-      </div>
-      <div className="mt-5">
-        </div>
-      <div className="song-btn-container">
+    {song.loadedSongs.length ? 
+    <div className="song-btn-container">
         {songBtns}
+        <Pager /> 
+    </div> : null }
+    <div className="backdrop">
+      <div className="container">
+        <div className="title-card-container">
+          <input className="title title-card" 
+            onChange={handleTitle} 
+            value={song.title}
+            placeholder="Untitled"
+            />
+
+          <small className="instructions title-card">
+            Use the mouse or keyboard to play. 
+            Move shortcuts around by using left and right arrow keys.
+          </small>
+        </div>
+        
+        <Instrument handleLoading={handleLoading} />
+        </div>
       </div>
     </>
   );

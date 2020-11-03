@@ -66,24 +66,31 @@ const SignUpForm = props => {
       <form onSubmit={handleSubmit}>
         
         <label>Username:</label>
+        <br />
         <input className="form" 
           type="text" 
           name="username" 
           onChange={handleUsername} 
         />
         
+        <br />
         <label>Password:</label>
+        <br />
         <input className="form" 
           type="password" 
           name="password" 
           onChange={handlePassword} 
         />
-        
+
+        <br/>
         <label>Confirm Password:</label>
+        <br />
         <input className="form" 
           type="password" name="password_confirmation" 
           onChange={handlePassword_confirmation} 
         />
+
+        <br />
         <input className="btn" type="submit" value="Sign Up" />
       </form>
     </div>

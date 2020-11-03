@@ -57,7 +57,7 @@ const SoundfontProvider = ({ render }) => {
       if (song.recording){
         // if recording, save note for posterity
         const note = { pitch: midiNumber, time: start, endTime: null, duration: null }
-        dispatch({ type: addNoteStart, payload: note})
+        dispatch({ type: addNoteStart.type, payload: note})
         // handleRecordNoteStart(note)
       } 
   };
@@ -79,7 +79,7 @@ const SoundfontProvider = ({ render }) => {
         const endTime = Date.now() - song.time
         const note = { pitch: midiNumber, endTime }
 
-        dispatch({ type: updateRecordedNotes, payload: note })
+        dispatch({ type: updateRecordedNotes.type, payload: note })
       } 
   };
 
