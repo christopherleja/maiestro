@@ -36,6 +36,10 @@ const song = createSlice({
       state.recordedNotes.notes.push(action.payload)
     },
 
+    addToLoaded: (state, action) => {
+      state.loadedSongs.push(action.payload)
+    },
+
     changeInstrument: (state, action) => {
       state.config.instrumentName = action.payload
     },
@@ -107,6 +111,7 @@ const song = createSlice({
 export const {
   addRecordedNotes,
   addNoteStart,
+  addToLoaded,
   changeInstrument,
   changeTitle,
   clearLoadedSongs,

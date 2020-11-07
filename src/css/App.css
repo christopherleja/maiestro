@@ -70,8 +70,8 @@ input {
     position: absolute;
     bottom: 0.25rem;
     width: 90%;
-    border-left: solid #111 1.5rem;
-    border-right: solid #111 1.5rem;
+    border: solid #111 1.5rem;
+    border-width: .5rem 1.5rem;
     border-radius: 5px;
   }
 
