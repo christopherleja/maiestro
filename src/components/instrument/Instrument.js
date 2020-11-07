@@ -9,6 +9,7 @@ import PianoConfig from './PianoConfig';
 import swal from 'sweetalert';
 
 import { 
+  addToLoaded,
   clearLoadedSongs, 
   clearRecordedNotes, 
   loadAllSongs,
@@ -36,7 +37,6 @@ const Instrument = (props) => {
   const handleSave = () => {
     // make sure song object is eligible to be saved
     if (currentUser && song.title.length){
-      
       let melody = {
         user_id: currentUser.id,
         title: song.title,
@@ -44,6 +44,7 @@ const Instrument = (props) => {
         instrument: song.config.instrumentName,
         notes: song.recordedNotes.notes
       }
+
       fetch(url + `/users/${currentUser.id}/songs`, {
         method: 'POST',
         headers: {
@@ -54,6 +55,9 @@ const Instrument = (props) => {
         })
         .then(r => r.json())
         .then(res => {
+          if (song.loadedSongs.length){
+            dispatch({type: addToLoaded.type, payload: res})
+          }
           swal(`${res.title} was saved successfully`);
         })
         .catch((err) => {
@@ -113,7 +117,7 @@ const Instrument = (props) => {
         return newNote
       })
 
-      // quantize the n for magenta, using their functions
+      // quantize the notes for magenta, using built-in functions
       let last = notesToSequence.length - 1
       const quantizeRecording = mm.sequences.quantizeNoteSequence(notesToSequence, 4)
       quantizeRecording.notes = notesToSequence
